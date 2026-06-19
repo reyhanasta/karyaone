@@ -193,7 +193,7 @@ jobs:
           npm ci
 
       - name: Copy Environment File
-        run: cp .env.testing .env
+        run: cp .env.test .env
 
       - name: Configure MySQL for Testing
         run: |
