@@ -1,0 +1,398 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - 'v*'
+  pull_request:
+    branches:
+      - main
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
+jobs:
+  lint:
+    name: Code Quality
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          tools: composer:v2
+          coverage: none
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: 'npm'
+
+      - name: Cache composer dependencies
+        uses: actions/cache@v4
+        with:
+          path: vendor
+          key: ${{ runner.os }}-composer-${{ hashFiles('composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-composer-
+
+      - name: Cache node modules
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-npm-${{ hashFiles('package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-npm-
+
+      - name: Install Dependencies
+        run: |
+          composer install --no-ansi --no-interaction --no-scripts --no-progress --ignore-platform-reqs
+          npm ci
+
+      - name: Run PHP Linter (Pint)
+        run: composer run test:lint
+
+      - name: Run ESLint
+        run: npm run lint
+
+      - name: Run Prettier Check
+        run: npm run format:check
+
+      - name: Generate Wayfinder Routes
+        run: |
+          cp .env.testing .env
+          php artisan key:generate
+          php artisan wayfinder:generate --with-form
+
+      - name: Run TypeScript Check
+        run: npm run types
+
+  test-frontend:
+    name: Frontend Tests
+    runs-on: ubuntu-22.04
+    needs: [lint]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          tools: composer:v2
+          coverage: none
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: 'npm'
+
+      - name: Cache node modules
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-npm-${{ hashFiles('package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-npm-
+
+      - name: Install Dependencies
+        run: |
+          composer install --no-ansi --no-interaction --no-scripts --no-progress --ignore-platform-reqs
+          npm ci
+
+      - name: Generate Wayfinder Routes
+        run: |
+          cp .env.testing .env
+          php artisan key:generate
+          php artisan wayfinder:generate --with-form
+
+      - name: Run Vitest
+        run: npm run test -- --run --coverage
+        env:
+          CI: true
+
+      - name: Upload coverage reports
+        uses: codecov/codecov-action@v4
+        with:
+          files: coverage/coverage-final.json
+          fail_ci_if_error: false
+        continue-on-error: true
+
+  test-backend:
+    name: Backend Tests
+    runs-on: ubuntu-22.04
+    needs: [lint]
+
+    strategy:
+      matrix:
+        php-version: ['8.3']
+      fail-fast: false
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: r3yh4n
+          MYSQL_DATABASE: btm_test
+        options: >-
+          --health-cmd="mysqladmin ping"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
+        ports:
+          - 3306:3306
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php-version }}
+          tools: composer:v2
+          coverage: xdebug
+          extensions: dom, curl, libxml, mbstring, zip, pcntl, pcre, pdo, sqlite, pdo_sqlite, bcmath, intl, gd, exif, iconv, pdo_mysql
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: 'npm'
+
+      - name: Cache composer dependencies
+        uses: actions/cache@v4
+        with:
+          path: vendor
+          key: ${{ runner.os }}-php${{ matrix.php-version }}-composer-${{ hashFiles('composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-php${{ matrix.php-version }}-composer-
+
+      - name: Cache node modules
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-npm-${{ hashFiles('package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-npm-
+
+      - name: Install Dependencies
+        run: |
+          composer install --no-ansi --no-interaction --no-scripts --no-progress --ignore-platform-reqs
+          npm ci
+
+      - name: Copy Environment File
+        run: cp .env.testing .env
+
+      - name: Configure MySQL for Testing
+        run: |
+          echo "DB_CONNECTION=mysql" >> .env
+          echo "DB_HOST=127.0.0.1" >> .env
+          echo "DB_PORT=3306" >> .env
+          echo "DB_DATABASE=btm_test" >> .env
+          echo "DB_USERNAME=root" >> .env
+          echo "DB_PASSWORD=r3yh4n" >> .env
+
+      - name: Generate Application Key
+        run: php artisan key:generate
+
+      - name: Generate Wayfinder Routes
+        run: php artisan wayfinder:generate --with-form
+
+      - name: Build Assets
+        run: npm run build
+      - name: Wait for MySQL
+        run: |
+          while ! mysqladmin ping -h"127.0.0.1" -u"root" -p"r3yh4n" --silent; do
+            echo 'waiting for mysql...'
+            sleep 1
+          done
+      - name: Run Database Migrations
+        run: php artisan migrate --force
+
+      - name: Run Pest Tests
+        run: ./vendor/bin/pest --colors=always --coverage --min=0
+        env:
+          XDEBUG_MODE: coverage
+
+      - name: Upload coverage reports
+        uses: codecov/codecov-action@v4
+        with:
+          files: coverage/clover.xml
+          fail_ci_if_error: false
+        continue-on-error: true
+  build-check:
+    name: Build Verification
+    runs-on: ubuntu-22.04
+    needs: [test-frontend, test-backend]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          tools: composer:v2
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: |
+          composer install --no-ansi --no-interaction --no-scripts --no-progress --ignore-platform-reqs
+          npm ci
+
+      - name: Copy Environment File
+        run: cp .env.testing .env
+
+      - name: Generate Application Key
+        run: php artisan key:generate
+
+      - name: Clear and Cache Config
+        run: php artisan config:cache
+
+      - name: Generate Wayfinder Routes
+        run: php artisan wayfinder:generate --with-form
+
+      - name: Build Frontend Assets
+        run: npm run build:ssr
+
+      - name: Verify Build Artifacts
+        run: |
+          test -f public/build/manifest.json || exit 1
+          test -f bootstrap/cache/services.php || exit 1
+
+  release:
+    name: Create Release
+    runs-on: ubuntu-22.04
+    needs: [build-check]
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v'))
+    permissions:
+      contents: write
+
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+      artifact_name: ${{ steps.artifact_name.outputs.name }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Get version info
+        id: version
+        run: |
+          VERSION=$(git describe --tags --always --dirty 2>/dev/null || git rev-parse --short HEAD)
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "build_time=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> $GITHUB_OUTPUT
+          echo "Building version: $VERSION"
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          tools: composer:v2
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: |
+          composer install --no-ansi --no-interaction --no-scripts --no-progress --ignore-platform-reqs
+          npm ci
+
+      - name: Generate Wayfinder Routes
+        run: |
+          cp .env.testing .env
+          php artisan key:generate
+          php artisan wayfinder:generate --with-form
+
+      - name: Build Frontend Assets
+        run: npm run build:ssr
+
+      - name: Optimize for Production
+        run: |
+          composer install --no-dev --optimize-autoloader --no-interaction --ignore-platform-reqs
+          php artisan config:clear
+          php artisan route:clear
+          php artisan view:clear
+
+      - name: Prepare Release Package
+        run: |
+          mkdir -p release
+          rsync -av \
+            --exclude='release' \
+            --exclude='.git' \
+            --exclude='node_modules' \
+            --exclude='vendor' \
+            --exclude='.github' \
+            --exclude='tests' \
+            --exclude='storage' \
+            --exclude='bootstrap/cache' \
+            --exclude='.env' \
+            --exclude='*.log' \
+            . release/
+
+          cp -r vendor release/
+          if [ -d "public/build" ]; then
+            cp -r public/build release/public/
+          fi
+
+          cat > release/DEPLOY_INFO.json << EOF
+          {
+            "version": "${{ steps.version.outputs.version }}",
+            "commit": "${{ github.sha }}",
+            "branch": "${{ github.ref_name }}",
+            "build_time": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
+            "build_by": "${{ github.actor }}"
+          }
+          EOF
+
+      - name: Create Release Archive
+        id: artifact_name
+        run: |
+          VERSION=${{ steps.version.outputs.version }}
+          ARTIFACT_NAME="btm-koperasi-${VERSION}.tar.gz"
+          cd release && tar -czf ../$ARTIFACT_NAME . && cd ..
+          sha256sum $ARTIFACT_NAME > ${ARTIFACT_NAME}.sha256
+          echo "name=$ARTIFACT_NAME" >> $GITHUB_OUTPUT
+
+      - name: Upload Release Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: btm-koperasi-release
+          path: |
+            ${{ steps.artifact_name.outputs.name }}
+            ${{ steps.artifact_name.outputs.name }}.sha256
+
+      - name: Create GitHub Release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true
+          body_path: .github/RELEASE_NOTES.md
+          files: |
+            ${{ steps.artifact_name.outputs.name }}
+            ${{ steps.artifact_name.outputs.name }}.sha256
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
