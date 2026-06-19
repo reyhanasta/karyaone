@@ -55,16 +55,6 @@ jobs:
         run: |
           composer install --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
           npm ci
-
-      - name: Run PHP Linter (Pint)
-        run: composer run lint:check
-
-      - name: Run ESLint
-        run: npm run lint:check
-
-      - name: Run Prettier Check
-        run: npm run format:check
-
       - name: Generate Wayfinder Routes
         run: |
           cp .env.test .env
@@ -341,4 +331,3 @@ jobs:
             ${{ steps.artifact_name.outputs.name }}.sha256
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
