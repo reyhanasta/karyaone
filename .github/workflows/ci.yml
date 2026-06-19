@@ -70,7 +70,7 @@ jobs:
 
       - name: Generate Wayfinder Routes
         run: |
-          cp .env.testing .env
+          cp .env.test .env
           php artisan key:generate
           php artisan wayfinder:generate --with-form
 
@@ -114,7 +114,7 @@ jobs:
 
       - name: Generate Wayfinder Routes
         run: |
-          cp .env.testing .env
+          cp .env.test .env
           php artisan key:generate
           php artisan wayfinder:generate --with-form
 
@@ -259,7 +259,7 @@ jobs:
           npm ci
 
       - name: Copy Environment File
-        run: cp .env.testing .env
+        run: cp .env.test .env
 
       - name: Generate Application Key
         run: php artisan key:generate
@@ -323,7 +323,7 @@ jobs:
 
       - name: Generate Wayfinder Routes
         run: |
-          cp .env.testing .env
+          cp .env.test .env
           php artisan key:generate
           php artisan wayfinder:generate --with-form
 
