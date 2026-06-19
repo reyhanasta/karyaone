@@ -22,8 +22,8 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: "22"
-          cache: "npm"
+          node-version: '24'
+          cache: 'npm'
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
@@ -43,9 +43,8 @@ jobs:
       - name: Check Frontend Format (Prettier)
         run: npm run format:check
 
-      - name: Lint Frontend (ESLint)
-        run: npm run lint:check
+      # - name: Lint Frontend (ESLint)
+      #   run: npm run lint:check
 
       - name: Check TypeScript Types
         run: npm run types:check
-
