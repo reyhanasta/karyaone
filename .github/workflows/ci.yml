@@ -60,7 +60,7 @@ jobs:
           npm ci
 
       - name: Run PHP Linter (Pint)
-        run: composer run test:lint
+        run: composer run lint:check
 
       - name: Run ESLint
         run: npm run lint
