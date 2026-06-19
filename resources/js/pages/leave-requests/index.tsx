@@ -73,8 +73,6 @@ export default function Index({
         status: Status;
     } | null>(null);
 
-    
-
     const executeStatusUpdate = () => {
         if (!confirmAction) return;
         router.post(

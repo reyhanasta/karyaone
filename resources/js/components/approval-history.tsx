@@ -1,7 +1,6 @@
 import { Check, Clock, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
-
 interface Approver {
     employee?: { full_name: string };
 }

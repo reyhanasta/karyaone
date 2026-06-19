@@ -147,7 +147,7 @@ export default function Show({
                 {
                     preserveScroll: true,
                     onSuccess: () => setConfirmAction(null),
-                }
+                },
             );
             return;
         }
@@ -165,7 +165,6 @@ export default function Show({
     const handleCancel = () => {
         setConfirmAction({ status: 'cancel' });
     };
-
 
     return (
         <AppLayout
@@ -217,21 +216,23 @@ export default function Show({
                     </div>
 
                     <div className="flex gap-2">
-                        {(leaveRequest.status.startsWith('pending') && !leaveRequest.manager_approver) && (
-                            <>
-                                {(leaveRequest.employee_id ===
-                                    currentUser.employee?.id ||
-                                    canEdit) && (
+                        {leaveRequest.status.startsWith('pending') &&
+                            !leaveRequest.manager_approver && (
+                                <>
+                                    {(leaveRequest.employee_id ===
+                                        currentUser.employee?.id ||
+                                        canEdit) && (
                                         <Link
                                             href={`/leave-requests/${leaveRequest.id}/edit`}
                                         >
                                             <Button variant="outline" size="lg">
-                                                <Edit className="h-4 w-4" /> Edit
+                                                <Edit className="h-4 w-4" />{' '}
+                                                Edit
                                             </Button>
                                         </Link>
                                     )}
-                                {leaveRequest.employee_id ===
-                                    currentUser.employee?.id && (
+                                    {leaveRequest.employee_id ===
+                                        currentUser.employee?.id && (
                                         <Button
                                             variant="outline"
                                             size="lg"
@@ -241,8 +242,8 @@ export default function Show({
                                             <X className="h-4 w-4" /> Batalkan
                                         </Button>
                                     )}
-                            </>
-                        )}
+                                </>
+                            )}
                     </div>
                 </div>
 
@@ -472,7 +473,7 @@ export default function Show({
                     }
                     variant={
                         confirmAction?.status === 'rejected' ||
-                            confirmAction?.status === 'cancel'
+                        confirmAction?.status === 'cancel'
                             ? 'destructive'
                             : 'default'
                     }

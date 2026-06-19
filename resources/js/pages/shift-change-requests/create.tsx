@@ -1,11 +1,5 @@
 import { Head, Link, useForm } from '@inertiajs/react';
-import {
-    CheckCircle,
-    Info,
-    User2,
-    UserRound,
-    Users,
-} from 'lucide-react';
+import { CheckCircle, Info, User2, UserRound, Users } from 'lucide-react';
 import { useMemo } from 'react';
 import { EmployeeCombobox } from '@/components/employee-combobox';
 import { Button } from '@/components/ui/button';

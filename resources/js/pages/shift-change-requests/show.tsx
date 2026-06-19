@@ -21,7 +21,6 @@ import type { Employee } from '@/components/user-card';
 import { usePermissions } from '@/hooks/use-permissions';
 import AppLayout from '@/layouts/app-layout';
 
-
 // ... (types)
 type Shift = { id: number; name: string; start_time: string; end_time: string };
 type ShiftChangeRequest = {
@@ -33,11 +32,11 @@ type ShiftChangeRequest = {
     targetShift?: Shift;
     reason: string;
     status:
-    | 'pending_target'
-    | 'pending_hrd'
-    | 'pending_manager'
-    | 'approved'
-    | 'rejected';
+        | 'pending_target'
+        | 'pending_hrd'
+        | 'pending_manager'
+        | 'approved'
+        | 'rejected';
     target_approved_at: string | null;
     targetApprovedBy?: { name: string };
     hrd_approved_at: string | null;
@@ -74,7 +73,10 @@ export default function Show({
         let url = '';
         let data: any = {};
 
-        if (confirmAction.type === 'approve_hrd' || confirmAction.type === 'approve_manager') {
+        if (
+            confirmAction.type === 'approve_hrd' ||
+            confirmAction.type === 'approve_manager'
+        ) {
             url = `/shift-change-requests/${request.id}/status`;
             data = { status: 'approved' };
         } else if (confirmAction.type === 'reject') {
@@ -148,11 +150,12 @@ export default function Show({
                     </div>
 
                     <div className="ml-auto flex gap-2">
-                        {(request.status.startsWith('pending') && !request.manager_approved_at) && (
-                            <>
-                                {(request.requester.id ===
-                                    auth.user.employee?.id ||
-                                    canEdit) && (
+                        {request.status.startsWith('pending') &&
+                            !request.manager_approved_at && (
+                                <>
+                                    {(request.requester.id ===
+                                        auth.user.employee?.id ||
+                                        canEdit) && (
                                         <Link
                                             href={`/shift-change-requests/${request.id}/edit`}
                                         >
@@ -161,12 +164,13 @@ export default function Show({
                                                 size="lg"
                                                 className="rounded-xl shadow-sm hover:bg-accent"
                                             >
-                                                <Edit className="h-4 w-4" /> Edit
+                                                <Edit className="h-4 w-4" />{' '}
+                                                Edit
                                             </Button>
                                         </Link>
                                     )}
-                                {request.requester.id ===
-                                    auth.user.employee?.id && (
+                                    {request.requester.id ===
+                                        auth.user.employee?.id && (
                                         <Button
                                             variant="outline"
                                             size="lg"
@@ -176,8 +180,8 @@ export default function Show({
                                             <X className="h-4 w-4" /> Batalkan
                                         </Button>
                                     )}
-                            </>
-                        )}
+                                </>
+                            )}
                     </div>
                 </div>
 
@@ -354,25 +358,26 @@ export default function Show({
                     confirmAction?.type === 'reject'
                         ? 'Konfirmasi Penolakan'
                         : confirmAction?.type === 'cancel'
-                            ? 'Konfirmasi Pembatalan'
-                            : 'Konfirmasi Persetujuan'
+                          ? 'Konfirmasi Pembatalan'
+                          : 'Konfirmasi Persetujuan'
                 }
                 description={
                     confirmAction?.type === 'reject'
                         ? 'Apakah Anda yakin ingin menolak pengajuan ini?'
                         : confirmAction?.type === 'cancel'
-                            ? 'Apakah Anda yakin ingin membatalkan pengajuan ini? Tindakan ini tidak dapat dibatalkan.'
-                            : 'Apakah Anda yakin ingin menyetujui pengajuan ini? Tindakan ini akan memproses jadwal shift karyawan terkait secara otomatis.'
+                          ? 'Apakah Anda yakin ingin membatalkan pengajuan ini? Tindakan ini tidak dapat dibatalkan.'
+                          : 'Apakah Anda yakin ingin menyetujui pengajuan ini? Tindakan ini akan memproses jadwal shift karyawan terkait secara otomatis.'
                 }
                 confirmText={
                     confirmAction?.type === 'reject'
                         ? 'Ya, Tolak Pengajuan'
                         : confirmAction?.type === 'cancel'
-                            ? 'Ya, Batalkan Pengajuan'
-                            : 'Ya, Setujui Sekarang'
+                          ? 'Ya, Batalkan Pengajuan'
+                          : 'Ya, Setujui Sekarang'
                 }
                 variant={
-                    confirmAction?.type === 'reject' || confirmAction?.type === 'cancel'
+                    confirmAction?.type === 'reject' ||
+                    confirmAction?.type === 'cancel'
                         ? 'destructive'
                         : 'default'
                 }

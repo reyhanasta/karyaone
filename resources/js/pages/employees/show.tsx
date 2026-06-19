@@ -104,7 +104,6 @@ export default function Show({
     leaveStats: LeaveStats;
     leaveHistories: LeaveHistory[];
 }) {
-    
     const { can } = usePermissions();
 
     // Local states for Document actions

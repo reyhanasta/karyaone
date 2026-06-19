@@ -43,7 +43,6 @@ type TypeUsage = Record<
 >;
 
 export default function Create({
-    
     monthlyLimit,
     monthlyRemaining,
     employees,
@@ -51,7 +50,6 @@ export default function Create({
     typeUsage,
     canCreateAny,
 }: {
-    
     monthlyLimit?: number;
     monthlyUsage?: Record<string, number>;
     currentMonth?: string;

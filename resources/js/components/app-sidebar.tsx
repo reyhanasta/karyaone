@@ -102,8 +102,12 @@ const footerNavItems: NavItem[] = [];
 
 export function AppSidebar() {
     const { can, hasRole } = usePermissions();
-    const dashboardItem = mainNavItems.find((item) => item.title === 'Dashboard');
-    const platformItems = mainNavItems.filter((item) => item.title !== 'Dashboard');
+    const dashboardItem = mainNavItems.find(
+        (item) => item.title === 'Dashboard',
+    );
+    const platformItems = mainNavItems.filter(
+        (item) => item.title !== 'Dashboard',
+    );
 
     const visiblePlatformItems = platformItems.filter(
         (item) => !item.permission || can(item.permission),

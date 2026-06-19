@@ -149,7 +149,7 @@ export default function Edit({
                                         className={cn(
                                             'focus-visible:ring-primary/30',
                                             errors.full_name &&
-                                            'border-destructive',
+                                                'border-destructive',
                                         )}
                                         required
                                     />
@@ -179,7 +179,7 @@ export default function Edit({
                                         className={cn(
                                             'focus-visible:ring-primary/30',
                                             errors.email &&
-                                            'border-destructive',
+                                                'border-destructive',
                                         )}
                                         required
                                     />
@@ -279,8 +279,6 @@ export default function Edit({
                                 </div>
 
                                 <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-
-
                                     <div className="space-y-2.5">
                                         <Label
                                             htmlFor="department_id"
@@ -288,7 +286,6 @@ export default function Edit({
                                             className="font-medium"
                                         >
                                             <Building2 className="h-3.5 w-3.5 text-muted-foreground" />
-
                                             Departemen
                                         </Label>
                                         <Select
@@ -302,7 +299,7 @@ export default function Edit({
                                             }}
                                             required
                                         >
-                                            <SelectTrigger className="focus:ring-primary/30 w-full">
+                                            <SelectTrigger className="w-full focus:ring-primary/30">
                                                 <SelectValue placeholder="Pilih departemen" />
                                             </SelectTrigger>
                                             <SelectContent>
@@ -333,11 +330,17 @@ export default function Edit({
                                             }
                                             required
                                         >
-                                            <SelectTrigger 
-                                                className="focus:ring-primary/30 w-full"
+                                            <SelectTrigger
+                                                className="w-full focus:ring-primary/30"
                                                 disabled={!data.department_id}
                                             >
-                                                <SelectValue placeholder={!data.department_id ? "Pilih departemen terlebih dahulu" : "Pilih jabatan"} />
+                                                <SelectValue
+                                                    placeholder={
+                                                        !data.department_id
+                                                            ? 'Pilih departemen terlebih dahulu'
+                                                            : 'Pilih jabatan'
+                                                    }
+                                                />
                                             </SelectTrigger>
                                             <SelectContent>
                                                 {positions
@@ -391,7 +394,6 @@ export default function Edit({
                                             className="font-medium"
                                         >
                                             <Info className="h-3.5 w-3.5 text-muted-foreground" />
-
                                             Status Pegawai
                                         </Label>
                                         <Select
@@ -401,7 +403,7 @@ export default function Edit({
                                             }
                                             required
                                         >
-                                            <SelectTrigger className="focus:ring-primary/30 w-full">
+                                            <SelectTrigger className="w-full focus:ring-primary/30">
                                                 <SelectValue placeholder="Pilih status" />
                                             </SelectTrigger>
                                             <SelectContent>
@@ -438,10 +440,10 @@ export default function Edit({
                                                 setData(
                                                     'leave_quota',
                                                     parseInt(e.target.value) ||
-                                                    0,
+                                                        0,
                                                 )
                                             }
-                                            className="focus-visible:ring-primary/30 w-full"
+                                            className="w-full focus-visible:ring-primary/30"
                                             required
                                         />
                                         {errors.leave_quota && (
@@ -465,7 +467,7 @@ export default function Edit({
                                                 setData('role', v)
                                             }
                                         >
-                                            <SelectTrigger className="focus:ring-primary/30 w-full">
+                                            <SelectTrigger className="w-full focus:ring-primary/30">
                                                 <SelectValue placeholder="Pilih peran akses" />
                                             </SelectTrigger>
                                             <SelectContent>

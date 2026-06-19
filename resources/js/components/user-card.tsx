@@ -43,7 +43,7 @@ export function UserCard({
                 isActive
                     ? 'border-2 border-primary/20 bg-primary/5 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.2)]'
                     : 'border border-border/50 bg-card shadow-sm transition-shadow hover:border-border hover:shadow-md',
-                className
+                className,
             )}
         >
             <div
@@ -60,7 +60,10 @@ export function UserCard({
                 <p className="text-[10px] font-bold tracking-widest text-muted-foreground/70 uppercase">
                     {label}
                 </p>
-                <h3 className="truncate text-lg font-bold tracking-tight text-foreground" title={employee.full_name}>
+                <h3
+                    className="truncate text-lg font-bold tracking-tight text-foreground"
+                    title={employee.full_name}
+                >
                     {employee.full_name}
                 </h3>
                 <div className="flex flex-col">
@@ -76,11 +79,11 @@ export function UserCard({
                     <div className="mt-2">
                         <Badge
                             variant={
-                                status === 'DISETUJUI' 
-                                    ? 'success' 
-                                    : status === 'MENUNGGU' 
-                                        ? 'warning' 
-                                        : 'default'
+                                status === 'DISETUJUI'
+                                    ? 'success'
+                                    : status === 'MENUNGGU'
+                                      ? 'warning'
+                                      : 'default'
                             }
                             className="px-2.5 py-0.5 text-[9px] font-bold tracking-wider uppercase"
                         >

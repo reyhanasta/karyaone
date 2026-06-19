@@ -109,16 +109,21 @@ export function NotificationBell() {
         );
         setUnreadCount((prev) => Math.max(0, prev - 1));
         setOpen(false);
-        router.visit(url);
 
-        fetch(`/notifications/${id}/read`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': getCsrfToken(),
-                'X-Requested-With': 'XMLHttpRequest',
-            },
-        });
+        try {
+            await fetch(`/notifications/${id}/read`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': getCsrfToken(),
+                    'X-Requested-With': 'XMLHttpRequest',
+                },
+            });
+        } catch (e) {
+            console.error(e);
+        }
+
+        router.visit(url);
     };
 
     const markAllAsRead = async () => {

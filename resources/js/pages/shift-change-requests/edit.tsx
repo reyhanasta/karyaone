@@ -47,12 +47,10 @@ export default function Edit({
     request,
     shifts,
     employees = [],
-    
 }: {
     request: ShiftChangeRequest;
     shifts: Shift[];
     employees?: Employee[];
-    
 }) {
     const { data, setData, put, processing, errors } = useForm({
         requester_id: String(request.requester_id),
@@ -134,14 +132,18 @@ export default function Edit({
                             <Label>Karyawan Pemohon</Label>
                             <div className="flex items-center gap-3 rounded-md border border-muted bg-muted/30 p-3">
                                 <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-muted text-sm font-semibold text-muted-foreground">
-                                    {getInitials(request.requester?.full_name || '')}
+                                    {getInitials(
+                                        request.requester?.full_name || '',
+                                    )}
                                 </div>
                                 <div className="flex-1 overflow-hidden">
                                     <div className="truncate text-sm font-medium">
                                         {request.requester?.full_name}
                                     </div>
                                     <div className="truncate text-xs text-muted-foreground">
-                                        {request.requester?.position?.name ?? 'Pegawai'} — {request.requester?.department?.name}
+                                        {request.requester?.position?.name ??
+                                            'Pegawai'}{' '}
+                                        — {request.requester?.department?.name}
                                     </div>
                                 </div>
                             </div>

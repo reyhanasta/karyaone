@@ -165,7 +165,7 @@ export default function Show({
                 {
                     preserveScroll: true,
                     onSuccess: () => setConfirmAction(null),
-                }
+                },
             );
             return;
         }
@@ -185,12 +185,18 @@ export default function Show({
     };
 
     const handleToggleExport = () => {
-        router.post(`/overtime-requests/${overtimeRequest.id}/toggle-export`, {}, {
-            preserveScroll: true,
-        });
+        router.post(
+            `/overtime-requests/${overtimeRequest.id}/toggle-export`,
+            {},
+            {
+                preserveScroll: true,
+            },
+        );
     };
 
-    const isHRD = currentUser.roles.includes('hr-admin') || currentUser.roles.includes('super-admin');
+    const isHRD =
+        currentUser.roles.includes('hr-admin') ||
+        currentUser.roles.includes('super-admin');
 
     return (
         <AppLayout
@@ -239,21 +245,23 @@ export default function Show({
                         </div>
                     </div>
                     <div className="flex gap-2">
-                        {(overtimeRequest.status.startsWith('pending') && !overtimeRequest.manager_approver) && (
-                            <>
-                                {(overtimeRequest.employee_id ===
-                                    currentUser.employee?.id ||
-                                    canEdit) && (
+                        {overtimeRequest.status.startsWith('pending') &&
+                            !overtimeRequest.manager_approver && (
+                                <>
+                                    {(overtimeRequest.employee_id ===
+                                        currentUser.employee?.id ||
+                                        canEdit) && (
                                         <Link
                                             href={`/overtime-requests/${overtimeRequest.id}/edit`}
                                         >
                                             <Button variant="outline" size="lg">
-                                                <Edit className="h-4 w-4" /> Edit
+                                                <Edit className="h-4 w-4" />{' '}
+                                                Edit
                                             </Button>
                                         </Link>
                                     )}
-                                {overtimeRequest.employee_id ===
-                                    currentUser.employee?.id && (
+                                    {overtimeRequest.employee_id ===
+                                        currentUser.employee?.id && (
                                         <Button
                                             variant="outline"
                                             size="lg"
@@ -263,8 +271,8 @@ export default function Show({
                                             <X className="h-4 w-4" /> Batalkan
                                         </Button>
                                     )}
-                            </>
-                        )}
+                                </>
+                            )}
                     </div>
 
                     {/* Status Badge in Header */}
@@ -361,11 +369,15 @@ export default function Show({
                         {isHRD && (
                             <div className="flex items-center justify-between rounded-xl border border-blue-200 bg-blue-50/50 p-4 dark:border-blue-900/30 dark:bg-blue-900/10">
                                 <div className="space-y-0.5">
-                                    <Label htmlFor="export-toggle" className="text-sm font-bold tracking-tight">
+                                    <Label
+                                        htmlFor="export-toggle"
+                                        className="text-sm font-bold tracking-tight"
+                                    >
                                         Tampilkan di Export Data
                                     </Label>
                                     <p className="text-xs text-muted-foreground">
-                                        Jika diaktifkan, data lembur ini akan muncul saat melakukan export Excel/PDF.
+                                        Jika diaktifkan, data lembur ini akan
+                                        muncul saat melakukan export Excel/PDF.
                                     </p>
                                 </div>
                                 <Checkbox
@@ -490,7 +502,7 @@ export default function Show({
                     }
                     variant={
                         confirmAction?.status === 'rejected' ||
-                            confirmAction?.status === 'cancel'
+                        confirmAction?.status === 'cancel'
                             ? 'destructive'
                             : 'default'
                     }

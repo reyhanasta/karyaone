@@ -21,10 +21,8 @@ type OvertimeRequestData = {
 
 export default function Edit({
     overtimeRequest,
-    
 }: {
     overtimeRequest: OvertimeRequestData;
-    
 }) {
     const { data, setData, put, processing, errors } = useInertiaForm({
         employee_id: String(overtimeRequest.employee_id),
@@ -66,7 +64,9 @@ export default function Edit({
                         <div className="space-y-2">
                             <Label>Karyawan</Label>
                             <Input
-                                value={overtimeRequest.employee?.full_name || ''}
+                                value={
+                                    overtimeRequest.employee?.full_name || ''
+                                }
                                 disabled
                                 className="bg-muted/50"
                             />

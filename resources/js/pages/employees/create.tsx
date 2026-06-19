@@ -128,7 +128,7 @@ export default function Create({
                                             className={cn(
                                                 'pl-3 focus-visible:ring-primary/30',
                                                 errors.full_name &&
-                                                'border-destructive',
+                                                    'border-destructive',
                                             )}
                                             required
                                         />
@@ -160,7 +160,7 @@ export default function Create({
                                         className={cn(
                                             'focus-visible:ring-primary/30',
                                             errors.email &&
-                                            'border-destructive',
+                                                'border-destructive',
                                         )}
                                         required
                                     />
@@ -238,7 +238,6 @@ export default function Create({
                                         className="font-medium"
                                     >
                                         <Building2 className="h-3.5 w-3.5 text-muted-foreground" />
-
                                         Departemen
                                     </Label>
                                     <Select
@@ -254,7 +253,7 @@ export default function Create({
                                     >
                                         <SelectTrigger
                                             id="department_id"
-                                            className="focus:ring-primary/30 w-full"
+                                            className="w-full focus:ring-primary/30"
                                         >
                                             <SelectValue placeholder="Pilih departemen" />
                                         </SelectTrigger>
@@ -275,14 +274,13 @@ export default function Create({
                                         </p>
                                     )}
                                 </div>
-                                <div className="space-y-2.5 ">
+                                <div className="space-y-2.5">
                                     <Label
                                         htmlFor="position_id"
                                         required
                                         className="font-medium"
                                     >
                                         <Users2 className="h-3.5 w-3.5 text-muted-foreground" />
-
                                         Jabatan
                                     </Label>
                                     <Select
@@ -291,14 +289,19 @@ export default function Create({
                                             setData('position_id', v)
                                         }
                                         required
-
                                     >
                                         <SelectTrigger
                                             id="position_id"
-                                            className="focus:ring-primary/30 w-full"
+                                            className="w-full focus:ring-primary/30"
                                             disabled={!data.department_id}
                                         >
-                                            <SelectValue placeholder={!data.department_id ? "Pilih departemen terlebih dahulu" : "Pilih jabatan"} />
+                                            <SelectValue
+                                                placeholder={
+                                                    !data.department_id
+                                                        ? 'Pilih departemen terlebih dahulu'
+                                                        : 'Pilih jabatan'
+                                                }
+                                            />
                                         </SelectTrigger>
                                         <SelectContent>
                                             {positions
@@ -326,13 +329,11 @@ export default function Create({
                                     )}
                                 </div>
 
-
-
                                 <div className="space-y-2.5">
                                     <Label
                                         htmlFor="join_date"
                                         required
-                                        className="flex items-center gap-1.5 font-medium w-full"
+                                        className="flex w-full items-center gap-1.5 font-medium"
                                     >
                                         <Calendar className="h-3.5 w-3.5 text-muted-foreground" />
                                         Tanggal Bergabung
@@ -361,7 +362,6 @@ export default function Create({
                                         className="font-medium"
                                     >
                                         <Info className="h-3.5 w-3.5 text-muted-foreground" />
-
                                         Status Pegawai
                                     </Label>
                                     <Select
@@ -373,7 +373,7 @@ export default function Create({
                                     >
                                         <SelectTrigger
                                             id="employee_status"
-                                            className="focus:ring-primary/30 w-full"
+                                            className="w-full focus:ring-primary/30"
                                         >
                                             <SelectValue placeholder="Pilih status" />
                                         </SelectTrigger>
@@ -408,7 +408,7 @@ export default function Create({
                                             setData('role', v)
                                         }
                                     >
-                                        <SelectTrigger className="focus:ring-primary/30 w-full">
+                                        <SelectTrigger className="w-full focus:ring-primary/30">
                                             <SelectValue placeholder="Pilih peran akses" />
                                         </SelectTrigger>
                                         <SelectContent>
@@ -432,7 +432,7 @@ export default function Create({
                     </div>
 
                     {/* Form Actions */}
-                    <div className="flex items-center justify-end gap-3  font-sans">
+                    <div className="flex items-center justify-end gap-3 font-sans">
                         <Link href="/employees">
                             <Button
                                 variant="outline"

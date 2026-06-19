@@ -43,11 +43,11 @@ type ShiftChangeRequest = {
     requesterShift: Shift;
     manager_approved_at: string;
     status:
-    | 'pending_target'
-    | 'pending_hrd'
-    | 'pending_manager'
-    | 'approved'
-    | 'rejected';
+        | 'pending_target'
+        | 'pending_hrd'
+        | 'pending_manager'
+        | 'approved'
+        | 'rejected';
     created_at: string;
 };
 
@@ -114,39 +114,23 @@ export default function Index({
                     </Badge>
                 );
             case 'pending_hrd':
-                return (
-                    <Badge variant="warning">
-                        Menunggu HRD
-                    </Badge>
-                );
+                return <Badge variant="warning">Menunggu HRD</Badge>;
             case 'pending_manager':
-                return (
-                    <Badge variant="warning">
-                        Menunggu Kepala Ruangan
-                    </Badge>
-                );
+                return <Badge variant="warning">Menunggu Kepala Ruangan</Badge>;
             case 'approved':
-                return (
-                    <Badge variant="success">
-                        Disetujui
-                    </Badge>
-                );
+                return <Badge variant="success">Disetujui</Badge>;
             case 'rejected':
                 return <Badge variant="destructive">Ditolak</Badge>;
             case 'canceled':
-                return (
-                    <Badge variant="destructive">
-                        Dibatalkan
-                    </Badge>
-                );
+                return <Badge variant="destructive">Dibatalkan</Badge>;
             default:
                 return <Badge variant="outline">{status}</Badge>;
         }
     };
 
     const canCreate =
-        can('shift-change-request.create') || can('shift-change-request.create.any');
-
+        can('shift-change-request.create') ||
+        can('shift-change-request.create.any');
 
     return (
         <AppLayout
@@ -177,7 +161,8 @@ export default function Index({
                                 </Button>
                                 <Button variant="outline" asChild>
                                     <a href={getExportUrl('pdf')}>
-                                        <FileDown className="mr-2 h-4 w-4" /> PDF
+                                        <FileDown className="mr-2 h-4 w-4" />{' '}
+                                        PDF
                                     </a>
                                 </Button>
                             </>
@@ -308,7 +293,8 @@ export default function Index({
                                                     Detail
                                                 </Link>
                                             </Button>
-                                            {req.status.startsWith('pending') && !req.manager_approved_at &&
+                                            {req.status.startsWith('pending') &&
+                                                !req.manager_approved_at &&
                                                 (req.requester.id ===
                                                     auth.user.employee?.id ||
                                                     canEdit) && (

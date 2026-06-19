@@ -176,16 +176,17 @@ export default function Index({
                                         />
                                     </div>
                                     <div className="grid gap-2">
-                                        <div className="flex items-center justify-between mb-1">
+                                        <div className="mb-1 flex items-center justify-between">
                                             <Label>
-                                                Berlaku untuk Posisi (Pilih & Set
-                                                Wajib)
+                                                Berlaku untuk Posisi (Pilih &
+                                                Set Wajib)
                                             </Label>
                                             <div className="flex items-center gap-2">
                                                 <Checkbox
                                                     id="select-all-create"
                                                     checked={
-                                                        data.positions.length ===
+                                                        data.positions
+                                                            .length ===
                                                             positions.length &&
                                                         positions.length > 0
                                                     }
@@ -224,7 +225,7 @@ export default function Index({
                                                 />
                                                 <Label
                                                     htmlFor="select-all-create"
-                                                    className="text-xs font-medium cursor-pointer"
+                                                    className="cursor-pointer text-xs font-medium"
                                                 >
                                                     Pilih Semua
                                                 </Label>
@@ -308,12 +309,12 @@ export default function Index({
                                                                                     p,
                                                                                 ) =>
                                                                                     p.id ===
-                                                                                        pos.id
+                                                                                    pos.id
                                                                                         ? {
-                                                                                            ...p,
-                                                                                            is_required:
-                                                                                                !!checked,
-                                                                                        }
+                                                                                              ...p,
+                                                                                              is_required:
+                                                                                                  !!checked,
+                                                                                          }
                                                                                         : p,
                                                                             ),
                                                                         );
@@ -377,9 +378,7 @@ export default function Index({
                                         </TableCell>
                                         <TableCell>
                                             {type.is_active ? (
-                                                <Badge
-                                                    variant="success"
-                                                >
+                                                <Badge variant="success">
                                                     Aktif
                                                 </Badge>
                                             ) : (
@@ -465,9 +464,10 @@ export default function Index({
                                     />
                                 </div>
                                 <div className="grid gap-2">
-                                    <div className="flex items-center justify-between mb-1">
+                                    <div className="mb-1 flex items-center justify-between">
                                         <Label>
-                                            Berlaku untuk Posisi (Pilih & Set Wajib)
+                                            Berlaku untuk Posisi (Pilih & Set
+                                            Wajib)
                                         </Label>
                                         <div className="flex items-center gap-2">
                                             <Checkbox
@@ -510,7 +510,7 @@ export default function Index({
                                             />
                                             <Label
                                                 htmlFor="select-all-edit"
-                                                className="text-xs font-medium cursor-pointer"
+                                                className="cursor-pointer text-xs font-medium"
                                             >
                                                 Pilih Semua
                                             </Label>
@@ -590,12 +590,12 @@ export default function Index({
                                                                                 p,
                                                                             ) =>
                                                                                 p.id ===
-                                                                                    pos.id
+                                                                                pos.id
                                                                                     ? {
-                                                                                        ...p,
-                                                                                        is_required:
-                                                                                            !!checked,
-                                                                                    }
+                                                                                          ...p,
+                                                                                          is_required:
+                                                                                              !!checked,
+                                                                                      }
                                                                                     : p,
                                                                         ),
                                                                     );
