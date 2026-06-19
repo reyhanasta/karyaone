@@ -372,7 +372,7 @@ jobs:
         id: artifact_name
         run: |
           VERSION=${{ steps.version.outputs.version }}
-          ARTIFACT_NAME="btm-koperasi-${VERSION}.tar.gz"
+          ARTIFACT_NAME="karyaone-${VERSION}.tar.gz"
           cd release && tar -czf ../$ARTIFACT_NAME . && cd ..
           sha256sum $ARTIFACT_NAME > ${ARTIFACT_NAME}.sha256
           echo "name=$ARTIFACT_NAME" >> $GITHUB_OUTPUT
@@ -380,7 +380,7 @@ jobs:
       - name: Upload Release Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: btm-koperasi-release
+          name: karyaone-release
           path: |
             ${{ steps.artifact_name.outputs.name }}
             ${{ steps.artifact_name.outputs.name }}.sha256
