@@ -2,11 +2,10 @@
 
 use App\Models\Department;
 use App\Models\Employee;
-use App\Models\OvertimeRequest;
 use App\Models\Position;
 use App\Models\User;
 use App\Notifications\OvertimeRequestNotification;
-use Illuminate\Support\Facades\Notification;
+use Illuminate\Notifications\Events\NotificationSent;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 
@@ -29,7 +28,7 @@ beforeEach(function () {
     $hrAdminRole->syncPermissions(['overtime-request.view', 'overtime-request.approve.hrd']);
     $this->hrAdminUser = User::factory()->create();
     $this->hrAdminUser->assignRole('hr-admin');
-    
+
     $managerRole = Role::firstOrCreate(['name' => 'manager']);
     $managerRole->syncPermissions(['overtime-request.view', 'overtime-request.approve.manager']);
     $this->managerUser = User::factory()->create();
@@ -55,7 +54,7 @@ beforeEach(function () {
 });
 
 test('overtime request submission broadcasts a notification to HR and Managers', function () {
-    Event::fake([\Illuminate\Notifications\Events\NotificationSent::class]);
+    Event::fake([NotificationSent::class]);
 
     $response = $this->actingAs($this->employeeUser)->post(route('overtime-requests.store'), [
         'date' => now()->toDateString(),
@@ -67,9 +66,9 @@ test('overtime request submission broadcasts a notification to HR and Managers',
     $response->assertRedirect(route('overtime-requests.index'));
 
     Event::assertDispatched(
-        \Illuminate\Notifications\Events\NotificationSent::class,
+        NotificationSent::class,
         function ($event) {
-            if (!$event->notification instanceof OvertimeRequestNotification) {
+            if (! $event->notification instanceof OvertimeRequestNotification) {
                 return false;
             }
             if ($event->channel !== 'broadcast') {
@@ -77,6 +76,7 @@ test('overtime request submission broadcasts a notification to HR and Managers',
             }
 
             $broadcastData = $event->notification->toBroadcast($event->notifiable)->data;
+
             return $broadcastData['type'] === 'overtime_request'
                 && $broadcastData['action'] === 'submitted'
                 && $broadcastData['employee_id'] === $this->employee->id;

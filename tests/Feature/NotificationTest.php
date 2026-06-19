@@ -78,9 +78,9 @@ test('authenticated user can fetch their notifications', function () {
                     'data',
                     'read_at',
                     'created_at',
-                ]
+                ],
             ],
-            'unread_count'
+            'unread_count',
         ])
         ->assertJsonFragment([
             'unread_count' => 2,

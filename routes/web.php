@@ -12,7 +12,12 @@ use App\Http\Controllers\OvertimeRequestController;
 use App\Http\Controllers\PositionController;
 use App\Http\Controllers\ShiftChangeRequestController;
 use App\Http\Controllers\ShiftController;
+use App\Models\Employee;
+use App\Models\OvertimeRequest;
+use App\Models\User;
+use App\Notifications\OvertimeRequestNotification;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -137,21 +142,23 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ->only(['index', 'create', 'store', 'show', 'edit', 'update'])
         ->middleware('permission:shift-change-request.view');
 });
-Route::get('/trigger', function() {
-    $employee = \App\Models\Employee::where('full_name', 'Employee Medis 1')->first();
-    if(!$employee) return 'No employee';
-    
-    $request = \App\Models\OvertimeRequest::create([
+Route::get('/trigger', function () {
+    $employee = Employee::where('full_name', 'Employee Medis 1')->first();
+    if (! $employee) {
+        return 'No employee';
+    }
+
+    $request = OvertimeRequest::create([
         'employee_id' => $employee->id,
         'date' => now()->toDateString(),
         'start_time' => '17:00',
         'end_time' => '20:00',
         'description' => 'Triggering from Route',
-        'status' => 'pending_manager'
+        'status' => 'pending_manager',
     ]);
-    $users = Auth::check() ? [Auth::user()] : \App\Models\User::all();
-    \Illuminate\Support\Facades\Notification::send($users, new \App\Notifications\OvertimeRequestNotification($request, $employee, 'submitted'));
-    
+    $users = Auth::check() ? [Auth::user()] : User::all();
+    Notification::send($users, new OvertimeRequestNotification($request, $employee, 'submitted'));
+
     return 'Triggered';
 });
 
