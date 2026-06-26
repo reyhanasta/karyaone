@@ -69,10 +69,10 @@ class RoleAndPermissionSeeder extends Seeder
 
         $karu = Role::firstOrCreate(['name' => 'karu']);
         $karu->syncPermissions([
-            'shift.view', 'shift-change-request.view', 'shift-change-request.create', 'shift-change-request.edit', 'shift-change-request.approve.manager', 'shift-change-request.export',
+            'shift.view', 'shift-change-request.view', 'shift-change-request.create', 'shift-change-request.edit', 'shift-change-request.approve.manager', 'shift-change-request.export', 'shift-change-request.create.any',
             'document.upload',
-            'leave-request.view', 'leave-request.approve.manager', 'leave-request.create', 'leave-request.edit', 'leave-request.export',
-            'overtime-request.view', 'overtime-request.approve.manager', 'overtime-request.create', 'overtime-request.edit', 'overtime-request.export',
+            'leave-request.view', 'leave-request.approve.manager', 'leave-request.create', 'leave-request.edit', 'leave-request.export', 'leave-request.create.any',
+            'overtime-request.view', 'overtime-request.approve.manager', 'overtime-request.create', 'overtime-request.edit', 'overtime-request.export', 'overtime-request.create.any',
             'employee-profile.edit',
         ]);
 
