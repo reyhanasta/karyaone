@@ -51,8 +51,7 @@ export default function Index({
     filters: {
         status?: string;
         search?: string;
-        date_from?: string;
-        date_to?: string;
+        date?: string;
         leave_type_id?: string;
     };
 }) {
@@ -120,8 +119,7 @@ export default function Index({
         if (filters.status) params.append('status', filters.status);
         if (filters.leave_type_id)
             params.append('leave_type_id', filters.leave_type_id);
-        if (filters.date_from) params.append('date_from', filters.date_from);
-        if (filters.date_to) params.append('date_to', filters.date_to);
+        if (filters.date) params.append('date', filters.date);
 
         return `/leave-requests/export/${format}?${params.toString()}`;
     };
@@ -240,24 +238,15 @@ export default function Index({
                                 </SelectItem>
                             </SelectContent>
                         </Select>
-                        {/* <Input
-                            type="date"
-                            className="w-40"
-                            placeholder="Dari"
-                            value={filters.date_from ?? ''}
-                            onChange={(e) =>
-                                handleFilterChange('date_from', e.target.value)
-                            }
-                        />
                         <Input
                             type="date"
-                            className="w-40"
-                            placeholder="Sampai"
-                            value={filters.date_to ?? ''}
+                            className="w-44"
+                            placeholder="Tanggal Mulai"
+                            value={filters.date ?? ''}
                             onChange={(e) =>
-                                handleFilterChange('date_to', e.target.value)
+                                handleFilterChange('date', e.target.value)
                             }
-                        /> */}
+                        />
                     </div>
                 </div>
 

@@ -28,8 +28,7 @@ class OvertimeRequestExport implements FromQuery, ShouldAutoSize, WithColumnForm
     {
         $status = $this->filters['status'] ?? null;
         $search = $this->filters['search'] ?? null;
-        $dateFrom = $this->filters['date_from'] ?? null;
-        $dateTo = $this->filters['date_to'] ?? null;
+        $date = $this->filters['date'] ?? null;
 
         $query = OvertimeRequest::with(['employee.user', 'employee.department']);
 
@@ -45,8 +44,7 @@ class OvertimeRequestExport implements FromQuery, ShouldAutoSize, WithColumnForm
             $q->whereHas('employee', fn ($q2) => $q2->where('full_name', 'like', "%{$search}%"));
         });
 
-        $query->when($dateFrom, fn ($q) => $q->where('date', '>=', $dateFrom));
-        $query->when($dateTo, fn ($q) => $q->where('date', '<=', $dateTo));
+        $query->when($date, fn ($q) => $q->whereDate('date', $date));
 
         $query->where('is_display_export', true);
 

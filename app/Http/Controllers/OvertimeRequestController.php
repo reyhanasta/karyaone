@@ -23,23 +23,21 @@ class OvertimeRequestController extends Controller
     {
         $status = $request->input('status');
         $search = $request->input('search');
-        $dateFrom = $request->input('date_from');
-        $dateTo = $request->input('date_to');
+        $date = $request->input('date');
 
-        $query = $this->getBaseQuery($status, $search, $dateFrom, $dateTo);
+        $query = $this->getBaseQuery($status, $search, $date);
 
         return Inertia::render('overtime-requests/index', [
             'overtimeRequests' => $query->orderBy('date', 'desc')->paginate(10)->withQueryString(),
             'filters' => [
                 'status' => $status,
                 'search' => $search,
-                'date_from' => $dateFrom,
-                'date_to' => $dateTo,
+                'date' => $date,
             ],
         ]);
     }
 
-    private function getBaseQuery($status = null, $search = null, $dateFrom = null, $dateTo = null)
+    private function getBaseQuery($status = null, $search = null, $date = null)
     {
         $user = Auth::user();
         $query = OvertimeRequest::with('employee');
@@ -71,8 +69,7 @@ class OvertimeRequestController extends Controller
             $q->whereHas('employee', fn ($q2) => $q2->where('full_name', 'like', "%{$search}%"));
         });
 
-        $query->when($dateFrom, fn ($q) => $q->where('date', '>=', $dateFrom));
-        $query->when($dateTo, fn ($q) => $q->where('date', '<=', $dateTo));
+        $query->when($date, fn ($q) => $q->whereDate('date', $date));
 
         return $query;
     }
@@ -373,7 +370,7 @@ class OvertimeRequestController extends Controller
     public function exportExcel(Request $request)
     {
         $filename = 'overtime_requests_'.now()->format('Y-m-d').'.xlsx';
-        $filters = $request->only(['status', 'search', 'date_from', 'date_to']);
+        $filters = $request->only(['status', 'search', 'date']);
 
         return Excel::download(new OvertimeRequestExport($filters), $filename);
     }
@@ -383,8 +380,7 @@ class OvertimeRequestController extends Controller
         $requests = $this->getBaseQuery(
             $request->status,
             $request->search,
-            $request->date_from,
-            $request->date_to
+            $request->date
         )->where('is_display_export', true)->orderBy('date', 'desc')->get();
 
         $pdf = Pdf::loadView('exports.overtime-requests', compact('requests'));

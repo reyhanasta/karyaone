@@ -23,19 +23,21 @@ class ShiftChangeRequestController extends Controller
     {
         $status = $request->input('status');
         $search = $request->input('search');
+        $date = $request->input('date');
 
-        $query = $this->getBaseQuery($status, $search);
+        $query = $this->getBaseQuery($status, $search, $date);
 
         return Inertia::render('shift-change-requests/index', [
             'requests' => $query->paginate(15)->withQueryString(),
             'filters' => [
                 'status' => $status,
                 'search' => $search,
+                'date' => $date,
             ],
         ]);
     }
 
-    private function getBaseQuery($status = null, $search = null)
+    private function getBaseQuery($status = null, $search = null, $date = null)
     {
         $user = Auth::user();
         $query = ShiftChangeRequest::with([
@@ -79,19 +81,21 @@ class ShiftChangeRequestController extends Controller
                 ->orWhereHas('target', fn ($q2) => $q2->where('full_name', 'like', "%{$search}%"));
         });
 
+        $query->when($date, fn ($q) => $q->whereDate('request_date', $date));
+
         return $query;
     }
 
     public function exportExcel(Request $request)
     {
-        $requests = $this->getBaseQuery($request->status, $request->search)->get();
+        $requests = $this->getBaseQuery($request->status, $request->search, $request->date)->get();
 
         return Excel::download(new ShiftChangeRequestsExport($requests), 'shift_change_requests_'.now()->format('YmdHis').'.xlsx');
     }
 
     public function exportPdf(Request $request)
     {
-        $requests = $this->getBaseQuery($request->status, $request->search)->get();
+        $requests = $this->getBaseQuery($request->status, $request->search, $request->date)->get();
         $pdf = Pdf::loadView('exports.shift-change-requests', compact('requests'));
 
         return $pdf->download('shift_change_requests_'.now()->format('YmdHis').'.pdf');

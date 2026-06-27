@@ -49,8 +49,7 @@ export default function Index({
     filters: {
         status?: string;
         search?: string;
-        date_from?: string;
-        date_to?: string;
+        date?: string;
     };
 }) {
     const { can } = usePermissions();
@@ -123,8 +122,7 @@ export default function Index({
         const params = new URLSearchParams();
         if (search) params.append('search', search);
         if (filters.status) params.append('status', filters.status);
-        if (filters.date_from) params.append('date_from', filters.date_from);
-        if (filters.date_to) params.append('date_to', filters.date_to);
+        if (filters.date) params.append('date', filters.date);
 
         return `/overtime-requests/export/${format}?${params.toString()}`;
     };
@@ -220,24 +218,15 @@ export default function Index({
                                 </SelectItem>
                             </SelectContent>
                         </Select>
-                        {/* <Input
-                            type="date"
-                            className="w-40"
-                            placeholder="Dari"
-                            value={filters.date_from ?? ''}
-                            onChange={(e) =>
-                                handleFilterChange('date_from', e.target.value)
-                            }
-                        />
                         <Input
                             type="date"
-                            className="w-40"
-                            placeholder="Sampai"
-                            value={filters.date_to ?? ''}
+                            className="w-44"
+                            placeholder="Tanggal"
+                            value={filters.date ?? ''}
                             onChange={(e) =>
-                                handleFilterChange('date_to', e.target.value)
+                                handleFilterChange('date', e.target.value)
                             }
-                        /> */}
+                        />
                     </div>
                 </div>
 

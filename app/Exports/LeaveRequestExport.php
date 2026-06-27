@@ -28,8 +28,7 @@ class LeaveRequestExport implements FromQuery, ShouldAutoSize, WithColumnFormatt
     {
         $status = $this->filters['status'] ?? null;
         $search = $this->filters['search'] ?? null;
-        $dateFrom = $this->filters['date_from'] ?? null;
-        $dateTo = $this->filters['date_to'] ?? null;
+        $date = $this->filters['date'] ?? null;
         $leaveTypeId = $this->filters['leave_type_id'] ?? null;
 
         $query = LeaveRequest::with(['employee.user', 'employee.department', 'leaveType']);
@@ -48,8 +47,7 @@ class LeaveRequestExport implements FromQuery, ShouldAutoSize, WithColumnFormatt
             $q->whereHas('employee', fn ($q2) => $q2->where('full_name', 'like', "%{$search}%"));
         });
 
-        $query->when($dateFrom, fn ($q) => $q->where('start_date', '>=', $dateFrom));
-        $query->when($dateTo, fn ($q) => $q->where('end_date', '<=', $dateTo));
+        $query->when($date, fn ($q) => $q->whereDate('start_date', $date));
 
         return $query->latest();
     }

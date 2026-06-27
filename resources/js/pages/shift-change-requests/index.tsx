@@ -59,6 +59,7 @@ export default function Index({
     filters: {
         status?: string;
         search?: string;
+        date?: string;
     };
 }) {
     const { auth } = usePage().props as any;
@@ -99,6 +100,7 @@ export default function Index({
         const params = new URLSearchParams();
         if (search) params.append('search', search);
         if (filters.status) params.append('status', filters.status);
+        if (filters.date) params.append('date', filters.date);
 
         return `/shift-change-requests/export/${format}?${params.toString()}`;
     };
@@ -223,6 +225,15 @@ export default function Index({
                                 </SelectItem>
                             </SelectContent>
                         </Select>
+                        <Input
+                            type="date"
+                            className="w-44"
+                            placeholder="Tanggal"
+                            value={filters.date ?? ''}
+                            onChange={(e) =>
+                                handleFilterChange('date', e.target.value)
+                            }
+                        />
                     </div>
                 </div>
 

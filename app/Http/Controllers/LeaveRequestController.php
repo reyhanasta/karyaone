@@ -26,11 +26,10 @@ class LeaveRequestController extends Controller
     {
         $status = $request->input('status');
         $search = $request->input('search');
-        $dateFrom = $request->input('date_from');
-        $dateTo = $request->input('date_to');
+        $date = $request->input('date');
         $leaveTypeId = $request->input('leave_type_id');
 
-        $query = $this->getBaseQuery($status, $search, $dateFrom, $dateTo, $leaveTypeId);
+        $query = $this->getBaseQuery($status, $search, $date, $leaveTypeId);
 
         return Inertia::render('leave-requests/index', [
             'leaveRequests' => $query->latest()->paginate(10)->withQueryString(),
@@ -38,14 +37,13 @@ class LeaveRequestController extends Controller
             'filters' => [
                 'status' => $status,
                 'search' => $search,
-                'date_from' => $dateFrom,
-                'date_to' => $dateTo,
+                'date' => $date,
                 'leave_type_id' => $leaveTypeId,
             ],
         ]);
     }
 
-    private function getBaseQuery($status = null, $search = null, $dateFrom = null, $dateTo = null, $leaveTypeId = null)
+    private function getBaseQuery($status = null, $search = null, $date = null, $leaveTypeId = null)
     {
         $user = Auth::user();
         $query = LeaveRequest::with(['employee', 'leaveType']);
@@ -79,8 +77,7 @@ class LeaveRequestController extends Controller
             $q->whereHas('employee', fn ($q2) => $q2->where('full_name', 'like', "%{$search}%"));
         });
 
-        $query->when($dateFrom, fn ($q) => $q->where('start_date', '>=', $dateFrom));
-        $query->when($dateTo, fn ($q) => $q->where('end_date', '<=', $dateTo));
+        $query->when($date, fn ($q) => $q->whereDate('start_date', $date));
 
         return $query;
     }
@@ -533,7 +530,7 @@ class LeaveRequestController extends Controller
     public function exportExcel(Request $request)
     {
         $filename = 'leave_requests_'.now()->format('Y-m-d').'.xlsx';
-        $filters = $request->only(['status', 'search', 'date_from', 'date_to', 'leave_type_id']);
+        $filters = $request->only(['status', 'search', 'date', 'leave_type_id']);
 
         return Excel::download(new LeaveRequestExport($filters), $filename);
     }
@@ -543,8 +540,7 @@ class LeaveRequestController extends Controller
         $requests = $this->getBaseQuery(
             $request->status,
             $request->search,
-            $request->date_from,
-            $request->date_to,
+            $request->date,
             $request->leave_type_id
         )->latest()->get();
 
