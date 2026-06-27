@@ -38,7 +38,6 @@
     <table>
         <thead>
             <tr>
-                <th>ID</th>
                 <th>Karyawan</th>
                 <th>Jenis Cuti</th>
                 <th>Mulai</th>
@@ -51,7 +50,6 @@
         <tbody>
             @foreach($requests as $request)
                 <tr>
-                    <td>{{ $request->id }}</td>
                     <td>{{ $request->employee->full_name ?? '-' }}</td>
                     <td>{{ $request->leaveType->name ?? '-' }}</td>
                     <td>{{ \Carbon\Carbon::parse($request->start_date)->format('d-m-Y') }}</td>

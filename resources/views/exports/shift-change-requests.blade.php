@@ -38,7 +38,6 @@
     <table>
         <thead>
             <tr>
-                <th>ID</th>
                 <th>Pemohon</th>
                 <th>Karyawan Pengganti</th>
                 <th>Tanggal Shift</th>
@@ -51,7 +50,6 @@
         <tbody>
             @foreach($requests as $request)
                 <tr>
-                    <td>{{ $request->id }}</td>
                     <td>{{ $request->requester->full_name ?? '-' }}</td>
                     <td>{{ $request->target->full_name ?? '-' }}</td>
                     <td>{{ \Carbon\Carbon::parse($request->request_date)->format('d-m-Y') }}</td>
