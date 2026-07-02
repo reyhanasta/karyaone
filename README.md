@@ -5,7 +5,7 @@
 [![React](https://img.shields.io/badge/React-19.x-blue.svg)](https://react.dev)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
-**KaryaOne** (KaryaOne) is a modern, high-performance Human Resource Information System (HRIS) designed to streamline organizational workflows. Built with the latest tech stack, it provides a seamless experience for both administrators and employees.
+**KaryaOne** is a modern, high-performance Human Resource Information System (HRIS) specialized for **clinics and hospitals (HRIS Klinik & Rumah Sakit)**. Built to handle complex healthcare operations, it streamlines 24/7 shift rotations, medical staff schedule changes, and multi-tier clinical approval workflows involving roles like Kepala Ruangan (Karu), Kepala Bidang (Kabid), and HR.
 
 ---
 
