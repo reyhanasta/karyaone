@@ -14,7 +14,7 @@ class LeaveRequestPolicy
 
     public function view(User $user, LeaveRequest $leaveRequest): bool
     {
-        if ($user->can('leave-request.approve.hrd') || $user->can('leave-request.approve.director') || $user->hasAnyRole(['karu', 'manager'])) {
+        if ($user->can('leave-request.approve.hrd') || $user->can('leave-request.approve.director') || $user->can('leave-request.approve.manager')) {
             return true;
         }
 
@@ -33,7 +33,7 @@ class LeaveRequestPolicy
 
     public function updateStatus(User $user, LeaveRequest $leaveRequest): bool
     {
-        if ($user->can('leave-request.approve.hrd') || $user->can('leave-request.approve.director') || $user->hasAnyRole(['karu', 'manager'])) {
+        if ($user->can('leave-request.approve.hrd') || $user->can('leave-request.approve.director') || $user->can('leave-request.approve.manager')) {
             return true;
         }
 
