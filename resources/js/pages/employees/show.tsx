@@ -11,7 +11,6 @@ import {
     FileText,
     ShieldCheck,
     Clock,
-    Phone,
     Pencil,
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
@@ -260,9 +259,15 @@ export default function Show({
                                         {role.name}
                                     </Badge>
                                 ))}
-                                {/* <Badge variant="outline" className="capitalize bg-primary/5 text-primary border-primary/20">
-                                    {employee.employee_status?.replace('_', ' ')}
-                                </Badge> */}
+                                <Badge
+                                    variant="outline"
+                                    className="border-primary/20 bg-primary/5 text-primary capitalize"
+                                >
+                                    {employee.employee_status?.replace(
+                                        '_',
+                                        ' ',
+                                    )}
+                                </Badge>
                             </div>
                         </div>
                     </div>
@@ -274,11 +279,7 @@ export default function Show({
                                     : editMyProfile().url
                             }
                         >
-                            <Button
-                                variant="outline"
-                                size="sm"
-                                className="text-md"
-                            >
+                            <Button>
                                 <Pencil className="mr-1 mb-0.5 h-4 w-4" />
                                 Edit Profil
                             </Button>
@@ -380,19 +381,6 @@ export default function Show({
                                             </div>
                                         </div>
                                     )}
-                                    <div className="flex items-start gap-4 opacity-50">
-                                        <div className="rounded-full bg-muted p-2">
-                                            <Phone className="h-5 w-5 text-muted-foreground" />
-                                        </div>
-                                        <div>
-                                            <p className="text-sm font-medium text-muted-foreground">
-                                                Phone
-                                            </p>
-                                            <p className="text-base">
-                                                Belum ditambahkan
-                                            </p>
-                                        </div>
-                                    </div>
                                 </CardContent>
                             </Card>
 
