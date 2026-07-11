@@ -1,6 +1,6 @@
-import { Head, Link, useForm as useInertiaForm } from '@inertiajs/react';
+import { Head, Link, useForm } from '@inertiajs/react';
 import { Paperclip } from 'lucide-react';
-import type { FormEventHandler } from 'react';
+import type { SubmitEventHandler } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -36,14 +36,12 @@ type LeaveRequestData = {
 
 export default function Edit({
     leaveRequest,
-
     leaveTypes,
 }: {
     leaveRequest: LeaveRequestData;
-
     leaveTypes: LeaveType[];
 }) {
-    const { data, setData, post, processing, errors } = useInertiaForm({
+    const { data, setData, post, processing, errors } = useForm({
         _method: 'PUT',
         employee_id: String(leaveRequest.employee_id),
         leave_type_id: String(leaveRequest.leave_type_id || ''),
@@ -53,7 +51,7 @@ export default function Edit({
         attachment: null as File | null,
     });
 
-    const submit: FormEventHandler = (e) => {
+    const submit: SubmitEventHandler = (e) => {
         e.preventDefault();
         post(`/leave-requests/${leaveRequest.id}`, {
             forceFormData: true,

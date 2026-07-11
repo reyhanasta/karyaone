@@ -1,4 +1,4 @@
-import { Head, Link, useForm as useInertiaForm } from '@inertiajs/react';
+import { Head, Link, useForm } from '@inertiajs/react';
 import {
     UserPlus,
     ArrowLeft,
@@ -37,7 +37,7 @@ export default function Create({
     positions: any[];
     departments: any[];
 }) {
-    const { data, setData, post, processing, errors } = useInertiaForm({
+    const { data, setData, post, processing, errors } = useForm({
         nip: '',
         full_name: '',
         email: '',

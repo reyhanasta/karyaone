@@ -1,5 +1,5 @@
-import { Head, Link, useForm as useInertiaForm } from '@inertiajs/react';
-import type { FormEventHandler } from 'react';
+import { Head, Link, useForm } from '@inertiajs/react';
+import type { SubmitEventHandler } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -24,7 +24,7 @@ export default function Edit({
 }: {
     overtimeRequest: OvertimeRequestData;
 }) {
-    const { data, setData, put, processing, errors } = useInertiaForm({
+    const { data, setData, put, processing, errors } = useForm({
         employee_id: String(overtimeRequest.employee_id),
         date: overtimeRequest.date,
         start_time: overtimeRequest.start_time,
@@ -32,7 +32,7 @@ export default function Edit({
         description: overtimeRequest.description,
     });
 
-    const submit: FormEventHandler = (e) => {
+    const submit: SubmitEventHandler = (e) => {
         e.preventDefault();
         put(`/overtime-requests/${overtimeRequest.id}`);
     };

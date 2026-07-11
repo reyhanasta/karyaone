@@ -1,4 +1,4 @@
-import { Head, Link, useForm as useInertiaForm } from '@inertiajs/react';
+import { Head, Link, useForm } from '@inertiajs/react';
 import {
     User,
     ArrowLeft,
@@ -43,7 +43,7 @@ export default function Edit({
     positions: any[];
     departments: any[];
 }) {
-    const { data, setData, put, processing, errors } = useInertiaForm({
+    const { data, setData, put, processing, errors } = useForm({
         nip: employee.user?.nip || '',
         full_name: employee.full_name || '',
         email: employee.user?.email || '',

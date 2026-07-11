@@ -1,4 +1,4 @@
-import { Head, Link, useForm as useInertiaForm } from '@inertiajs/react';
+import { Head, Link, useForm } from '@inertiajs/react';
 import {
     AlertCircle,
     CheckCircle,
@@ -59,25 +59,23 @@ export default function Create({
     typeUsage?: TypeUsage;
     canCreateAny: boolean;
 }) {
-    const { data, setData, post, processing, errors, clearErrors } =
-        useInertiaForm<{
-            employee_id: string;
-            leave_type_id: string;
-            start_date: string;
-            end_date: string;
-            reason: string;
-            attachment: File | null;
-        }>({
-            employee_id: '',
-            leave_type_id:
-                leaveTypes
-                    .find((t) => t.name === 'Cuti Tahunan')
-                    ?.id.toString() || '',
-            start_date: '',
-            end_date: '',
-            reason: '',
-            attachment: null,
-        });
+    const { data, setData, post, processing, errors, clearErrors } = useForm<{
+        employee_id: string;
+        leave_type_id: string;
+        start_date: string;
+        end_date: string;
+        reason: string;
+        attachment: File | null;
+    }>({
+        employee_id: '',
+        leave_type_id:
+            leaveTypes.find((t) => t.name === 'Cuti Tahunan')?.id.toString() ||
+            '',
+        start_date: '',
+        end_date: '',
+        reason: '',
+        attachment: null,
+    });
 
     const submit: SubmitEventHandler = (e) => {
         e.preventDefault();
@@ -466,10 +464,9 @@ function LeaveFormFields({
         <>
             {!isFormDisabled && (
                 <>
-                    {/* Leave Type selector */}
-                    <div className="space-y-2">
+                    <div className="flex w-full flex-col gap-2">
                         <Label htmlFor="leave_type_id" required>
-                            Jenis Cuti
+                            Jenis Pengajuan Cuti
                         </Label>
                         {leaveTypes.length === 0 ? (
                             <Button
@@ -528,7 +525,6 @@ function LeaveFormFields({
                                 id="start_date"
                                 type="date"
                                 value={data.start_date}
-                                min={!canCreateAny ? todayFormatted : undefined}
                                 onChange={(e) =>
                                     setData('start_date', e.target.value)
                                 }

@@ -1,5 +1,5 @@
 import { Head, useForm } from '@inertiajs/react';
-import type { FormEventHandler } from 'react';
+import type { SubmitEventHandler } from 'react';
 import InputError from '@/components/input-error';
 import TextLink from '@/components/text-link';
 import { Button } from '@/components/ui/button';
@@ -33,7 +33,7 @@ export default function Register({ departments, positions }: Props) {
         password_confirmation: '',
     });
 
-    const submit: FormEventHandler = (e) => {
+    const submit: SubmitEventHandler = (e) => {
         e.preventDefault();
         post('/register', {
             onFinish: () => reset('password', 'password_confirmation'),

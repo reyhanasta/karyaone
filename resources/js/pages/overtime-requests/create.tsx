@@ -1,6 +1,6 @@
-import { Head, Link, useForm as useInertiaForm } from '@inertiajs/react';
+import { Head, Link, useForm } from '@inertiajs/react';
 import { CheckCircle, Info, UserRound, Users } from 'lucide-react';
-import type { FormEventHandler } from 'react';
+import type { SubmitEventHandler } from 'react';
 import { EmployeeCombobox } from '@/components/employee-combobox';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -23,22 +23,21 @@ export default function Create({
     employees?: Employee[];
     canCreateAny: boolean;
 }) {
-    const { data, setData, post, processing, errors, clearErrors } =
-        useInertiaForm<{
-            employee_id: string;
-            date: string;
-            start_time: string;
-            end_time: string;
-            description: string;
-        }>({
-            employee_id: '',
-            date: '',
-            start_time: '',
-            end_time: '',
-            description: '',
-        });
+    const { data, setData, post, processing, errors, clearErrors } = useForm<{
+        employee_id: string;
+        date: string;
+        start_time: string;
+        end_time: string;
+        description: string;
+    }>({
+        employee_id: '',
+        date: '',
+        start_time: '',
+        end_time: '',
+        description: '',
+    });
 
-    const submit: FormEventHandler = (e) => {
+    const submit: SubmitEventHandler = (e) => {
         e.preventDefault();
         post('/overtime-requests');
     };
