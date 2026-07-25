@@ -27,7 +27,10 @@ class EmployeeController extends Controller
     public function myProfile(Request $request)
     {
         // Ambil data employee milik user yang sedang login
-        $employee = $request->user()->employee;
+        /** @var User $user */
+        $user = $request->user();
+        /** @var Employee|null $employee */
+        $employee = $user->employee;
 
         if (! $employee) {
             abort(404, 'Data Karyawan tidak ditemukan untuk user ini.');
@@ -39,7 +42,10 @@ class EmployeeController extends Controller
 
     public function editMyProfile(Request $request)
     {
-        $employee = $request->user()->employee;
+        /** @var User $user */
+        $user = $request->user();
+        /** @var Employee|null $employee */
+        $employee = $user->employee;
         if (! $employee) {
             abort(404, 'Data Karyawan tidak ditemukan.');
         }
@@ -49,7 +55,9 @@ class EmployeeController extends Controller
 
     public function updateMyProfile(Request $request)
     {
+        /** @var User $user */
         $user = $request->user();
+        /** @var Employee|null $employee */
         $employee = $user->employee;
 
         if (! $employee) {

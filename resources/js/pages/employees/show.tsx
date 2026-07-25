@@ -207,7 +207,7 @@ export default function Show({
         <AppLayout
             breadcrumbs={[
                 { title: 'Dasbor', href: '/dashboard' },
-                { title: 'Karyawan', href: '/employees' },
+                { title: 'Karyawan', href: `#` },
                 {
                     title: employee.full_name,
                     href: `/employees/${employee.id}`,
@@ -217,17 +217,7 @@ export default function Show({
             <Head title={`Profil Karyawan: ${employee.full_name}`} />
 
             <div className="mx-auto flex w-full max-w-6xl flex-1 flex-col gap-6 p-4 lg:p-8">
-                {/* Back Button */}
-                {/* <div>
-                    <Link href="/employees">
-                        <Button variant="ghost" size="sm" className="-ml-2">
-                            <ChevronLeft className="mr-1 h-4 w-4" /> Kembali ke
-                            Direktori
-                        </Button>
-                    </Link>
-                </div> */}
-
-                {/* header profile section */}
+                {/* Header profile section */}
                 <div className="flex flex-col gap-6 rounded-xl border bg-card p-6 shadow-sm sm:flex-row sm:items-center sm:justify-between">
                     <div className="flex flex-col gap-6 sm:flex-row sm:items-center">
                         <div className="flex h-24 w-24 items-center justify-center rounded-full bg-primary/10 text-primary">
@@ -259,15 +249,6 @@ export default function Show({
                                         {role.name}
                                     </Badge>
                                 ))}
-                                <Badge
-                                    variant="outline"
-                                    className="border-primary/20 bg-primary/5 text-primary capitalize"
-                                >
-                                    {employee.employee_status?.replace(
-                                        '_',
-                                        ' ',
-                                    )}
-                                </Badge>
                             </div>
                         </div>
                     </div>
@@ -301,12 +282,6 @@ export default function Show({
                             Informasi Umum
                         </TabsTrigger>
                         <TabsTrigger
-                            value="job"
-                            className="rounded-none border-b-2 border-transparent px-6 py-3 data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none"
-                        >
-                            Detail Pekerjaan
-                        </TabsTrigger>
-                        <TabsTrigger
                             value="dokumen"
                             className="rounded-none border-b-2 border-transparent px-6 py-3 data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none"
                         >
@@ -315,72 +290,148 @@ export default function Show({
                     </TabsList>
 
                     {/* Tab Pane: Informasi Umum & Cuti */}
-                    <TabsContent value="informasi" className="space-y-6">
-                        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-                            {/* Personal Details Card */}
-                            <Card className="shadow-none">
+                    <TabsContent value="informasi" className="space-y-
+                    4">
+                        <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
+                            {/* Personal & Job Details Card */}
+                            <Card className="col-span-2 shadow-none">
                                 <CardHeader>
                                     <CardTitle className="text-lg">
-                                        Personal Details
+                                        Personal & Job Details
                                     </CardTitle>
                                 </CardHeader>
                                 <CardContent className="space-y-6">
-                                    <div className="flex items-start gap-4">
-                                        <div className="rounded-full bg-muted p-2">
-                                            <Mail className="h-5 w-5 text-muted-foreground" />
-                                        </div>
-                                        <div>
-                                            <p className="text-sm font-medium text-muted-foreground">
-                                                Email
-                                            </p>
-                                            <p className="text-base font-semibold">
-                                                {employee.user?.email}
-                                            </p>
-                                        </div>
-                                    </div>
-                                    <div className="flex items-start gap-4">
-                                        <div className="rounded-full bg-muted p-2">
-                                            <Calendar className="h-5 w-5 text-muted-foreground" />
-                                        </div>
-                                        <div>
-                                            <p className="text-sm font-medium text-muted-foreground">
-                                                Join Date
-                                            </p>
-                                            <p className="text-base font-semibold">
-                                                {formatDate(employee.join_date)}
-                                            </p>
-                                        </div>
-                                    </div>
-                                    <div className="flex items-start gap-4">
-                                        <div className="rounded-full bg-muted p-2">
-                                            <Clock className="h-5 w-5 text-muted-foreground" />
-                                        </div>
-                                        <div>
-                                            <p className="text-sm font-medium text-muted-foreground">
-                                                Lama Kerja
-                                            </p>
-                                            <p className="text-base font-semibold">
-                                                {calculateTenure(
-                                                    employee.join_date,
+                                    <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+                                        {/* Personal Details */}
+                                        <div className="space-y-6">
+                                            <h4 className="text-sm font-semibold tracking-wider text-muted-foreground uppercase">
+                                                Personal Details
+                                            </h4>
+                                            <div className="space-y-5">
+                                                <div className="flex items-start gap-4">
+                                                    <div className="rounded-full bg-muted p-2">
+                                                        <Mail className="h-5 w-5 text-muted-foreground" />
+                                                    </div>
+                                                    <div>
+                                                        <p className="text-sm font-medium text-muted-foreground">
+                                                            Email
+                                                        </p>
+                                                        <p className="text-base font-semibold">
+                                                            {
+                                                                employee.user
+                                                                    ?.email
+                                                            }
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                                <div className="flex items-start gap-4">
+                                                    <div className="rounded-full bg-muted p-2">
+                                                        <Calendar className="h-5 w-5 text-muted-foreground" />
+                                                    </div>
+                                                    <div>
+                                                        <p className="text-sm font-medium text-muted-foreground">
+                                                            Join Date
+                                                        </p>
+                                                        <p className="text-base font-semibold">
+                                                            {formatDate(
+                                                                employee.join_date,
+                                                            )}
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                                <div className="flex items-start gap-4">
+                                                    <div className="rounded-full bg-muted p-2">
+                                                        <Clock className="h-5 w-5 text-muted-foreground" />
+                                                    </div>
+                                                    <div>
+                                                        <p className="text-sm font-medium text-muted-foreground">
+                                                            Lama Kerja
+                                                        </p>
+                                                        <p className="text-base font-semibold">
+                                                            {calculateTenure(
+                                                                employee.join_date,
+                                                            )}
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                                {employee.employee_sip && (
+                                                    <div className="flex items-start gap-4">
+                                                        <div className="rounded-full bg-muted p-2">
+                                                            <ShieldCheck className="h-5 w-5 text-muted-foreground" />
+                                                        </div>
+                                                        <div>
+                                                            <p className="text-sm font-medium text-muted-foreground">
+                                                                No SIP
+                                                            </p>
+                                                            <p className="text-base font-semibold">
+                                                                {
+                                                                    employee.employee_sip
+                                                                }
+                                                            </p>
+                                                        </div>
+                                                    </div>
                                                 )}
-                                            </p>
+                                            </div>
+                                        </div>
+
+                                        {/* Detail Pekerjaan */}
+                                        <div className="space-y-6">
+                                            <h4 className="text-sm font-semibold tracking-wider text-muted-foreground uppercase">
+                                                Detail Pekerjaan
+                                            </h4>
+                                            <div className="space-y-5">
+                                                <div className="flex items-start gap-4">
+                                                    <div className="rounded-full bg-muted p-2">
+                                                        <BuildingIcon className="h-5 w-5 text-muted-foreground" />
+                                                    </div>
+                                                    <div>
+                                                        <p className="text-sm font-medium text-muted-foreground">
+                                                            Departemen
+                                                        </p>
+                                                        <p className="text-base font-semibold">
+                                                            {employee.department
+                                                                ?.name || 'N/A'}
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                                <div className="flex items-start gap-4">
+                                                    <div className="rounded-full bg-muted p-2">
+                                                        <Briefcase className="h-5 w-5 text-muted-foreground" />
+                                                    </div>
+                                                    <div>
+                                                        <p className="text-sm font-medium text-muted-foreground">
+                                                            Jabatan
+                                                        </p>
+                                                        <p className="text-base font-semibold">
+                                                            {employee.position
+                                                                ?.name || 'N/A'}
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                                <div className="flex items-start gap-4">
+                                                    <div className="rounded-full bg-muted p-2">
+                                                        <ShieldCheck className="h-5 w-5 text-muted-foreground" />
+                                                    </div>
+                                                    <div>
+                                                        <p className="text-sm font-medium text-muted-foreground">
+                                                            Status Pegawai
+                                                        </p>
+                                                        <div className="mt-1">
+                                                            <Badge
+                                                                variant="success"
+                                                                className="capitalize"
+                                                            >
+                                                                {employee.employee_status?.replace(
+                                                                    '_',
+                                                                    ' ',
+                                                                )}
+                                                            </Badge>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
-                                    {employee.employee_sip && (
-                                        <div className="flex items-start gap-4">
-                                            <div className="rounded-full bg-muted p-2">
-                                                <ShieldCheck className="h-5 w-5 text-muted-foreground" />
-                                            </div>
-                                            <div>
-                                                <p className="text-sm font-medium text-muted-foreground">
-                                                    No SIP
-                                                </p>
-                                                <p className="text-base font-semibold">
-                                                    {employee.employee_sip}
-                                                </p>
-                                            </div>
-                                        </div>
-                                    )}
                                 </CardContent>
                             </Card>
 
@@ -432,113 +483,47 @@ export default function Show({
                                             />
                                         </div>
                                     </div>
-                                    <Separator />
-                                    <div className="space-y-4">
-                                        <h4 className="text-sm font-semibold">
-                                            Riwayat Cuti
-                                        </h4>
-                                        {leaveHistories &&
-                                        leaveHistories.length > 0 ? (
-                                            <div className="space-y-4">
-                                                {leaveHistories.map((leave) => (
-                                                    <div
-                                                        key={leave.id}
-                                                        className="grid grid-cols-1 gap-2 border-b pb-4 text-sm last:border-0 last:pb-0 sm:grid-cols-3 sm:gap-4"
-                                                    >
-                                                        <div className="font-medium text-muted-foreground">
-                                                            {leave.type_name}
-                                                        </div>
-                                                        <div className="text-foreground">
-                                                            {leave.date_string}{' '}
-                                                            <br />
-                                                            <span className="text-xs text-muted-foreground">
-                                                                ({leave.days}{' '}
-                                                                hari)
-                                                            </span>
-                                                        </div>
-                                                        <div className="text-foreground">
-                                                            Deskripsi: <br />
-                                                            <span className="text-muted-foreground">
-                                                                {leave.reason ||
-                                                                    '-'}
-                                                            </span>
-                                                        </div>
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        ) : (
-                                            <p className="py-2 text-sm text-muted-foreground">
-                                                Belum ada riwayat pengajuan cuti
-                                                yang disetujui.
-                                            </p>
-                                        )}
-                                    </div>
                                 </CardContent>
                             </Card>
                         </div>
-                    </TabsContent>
-
-                    {/* Tab Pane: Detail Pekerjaan */}
-                    <TabsContent value="job">
-                        <Card className="shadow-none">
-                            <CardHeader className="flex flex-row items-center justify-between">
-                                <div>
-                                    <CardTitle className="text-lg">
-                                        Detail Pekerjaan (Job Details)
-                                    </CardTitle>
-                                    <CardDescription>
-                                        Informasi struktural dan tanggung jawab
-                                        karyawan.
-                                    </CardDescription>
-                                </div>
+                        <Card>
+                            <CardHeader>
+                                <CardTitle className="text-lg">
+                                    Riwayat Cuti
+                                </CardTitle>
                             </CardHeader>
-                            <CardContent className="p-0">
-                                <div className="divide-y border-t">
-                                    <div className="grid grid-cols-1 gap-1 p-6 sm:grid-cols-3 sm:gap-4">
-                                        <dt className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
-                                            <BuildingIcon className="h-4 w-4" />{' '}
-                                            Departemen
-                                        </dt>
-                                        <dd className="text-sm font-semibold sm:col-span-2">
-                                            {employee.department?.name || 'N/A'}
-                                        </dd>
-                                    </div>
-                                    <div className="grid grid-cols-1 gap-1 p-6 sm:grid-cols-3 sm:gap-4">
-                                        <dt className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
-                                            <Briefcase className="h-4 w-4" />{' '}
-                                            Jabatan (Position)
-                                        </dt>
-                                        <dd className="text-sm font-semibold sm:col-span-2">
-                                            {employee.position?.name || 'N/A'}
-                                        </dd>
-                                    </div>
-                                    <div className="grid grid-cols-1 gap-1 p-6 sm:grid-cols-3 sm:gap-4">
-                                        <dt className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
-                                            <ShieldCheck className="h-4 w-4" />{' '}
-                                            Status Pegawai
-                                        </dt>
-                                        <dd className="text-sm sm:col-span-2">
-                                            <Badge
-                                                variant="success"
-                                                className="capitalize"
+                            <CardContent>
+                                {leaveHistories && leaveHistories.length > 0 ? (
+                                    <div className="space-y-4">
+                                        {leaveHistories.map((leave) => (
+                                            <div
+                                                key={leave.id}
+                                                className="grid grid-cols-1 items-center gap-2 border-b pb-4 text-sm last:border-0 last:pb-0 sm:grid-cols-3 sm:gap-4"
                                             >
-                                                {employee.employee_status?.replace(
-                                                    '_',
-                                                    ' ',
-                                                )}
-                                            </Badge>
-                                        </dd>
+                                                <div className="font-medium text-muted-foreground">
+                                                    {leave.type_name}
+                                                </div>
+                                                <div className="text-foreground">
+                                                    {leave.date_string} <br />
+                                                    <span className="text-xs text-muted-foreground">
+                                                        ({leave.days} hari)
+                                                    </span>
+                                                </div>
+                                                <div className="text-foreground">
+                                                    Deskripsi: <br />
+                                                    <span className="text-muted-foreground">
+                                                        {leave.reason || '-'}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        ))}
                                     </div>
-                                    <div className="grid grid-cols-1 gap-1 p-6 opacity-50 sm:grid-cols-3 sm:gap-4">
-                                        <dt className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
-                                            <UserCircle className="h-4 w-4" />{' '}
-                                            Reporting Manager
-                                        </dt>
-                                        <dd className="text-sm italic sm:col-span-2">
-                                            Data belum tersedia
-                                        </dd>
-                                    </div>
-                                </div>
+                                ) : (
+                                    <p className="py-2 text-sm text-muted-foreground">
+                                        Belum ada riwayat pengajuan cuti yang
+                                        disetujui.
+                                    </p>
+                                )}
                             </CardContent>
                         </Card>
                     </TabsContent>

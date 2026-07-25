@@ -19,7 +19,8 @@ class StoreLeaveRequest extends FormRequest
 
         $rules = [
             'leave_type_id' => 'required|exists:leave_types,id',
-            'start_date' => $canCreateAny ? 'required|date' : 'required|date|after_or_equal:today',
+            // 'start_date' => $canCreateAny ? 'required|date' : 'required|date|after_or_equal:today',
+            'start_date' => 'required|date',
             'end_date' => 'required|date|after_or_equal:start_date',
             'reason' => 'required|string|max:500',
         ];
