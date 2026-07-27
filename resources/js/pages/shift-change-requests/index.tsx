@@ -7,6 +7,7 @@ import {
     RefreshCw,
     FileDown,
     FileSpreadsheet,
+    RotateCcw,
     Search,
     Pencil,
 } from 'lucide-react';
@@ -14,6 +15,7 @@ import { useState, useRef } from 'react';
 import { Pagination } from '@/components/pagination';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { DateRangePicker } from '@/components/ui/date-range-picker';
 import { Input } from '@/components/ui/input';
 import {
     Select,
@@ -59,7 +61,8 @@ export default function Index({
     filters: {
         status?: string;
         search?: string;
-        date?: string;
+        start_date?: string;
+        end_date?: string;
     };
 }) {
     const { auth } = usePage().props as any;
@@ -96,11 +99,50 @@ export default function Index({
         );
     };
 
+    const handleDateRangeChange = (range: {
+        startDate?: string;
+        endDate?: string;
+    }) => {
+        router.get(
+            '/shift-change-requests',
+            {
+                ...filters,
+                search,
+                start_date: range.startDate,
+                end_date: range.endDate,
+            },
+            {
+                preserveState: true,
+                replace: true,
+            },
+        );
+    };
+
+    const hasActiveFilters = Boolean(
+        search ||
+        (filters.status && filters.status !== 'all') ||
+        filters.start_date ||
+        filters.end_date,
+    );
+
+    const handleResetFilters = () => {
+        setSearch('');
+        router.get(
+            '/shift-change-requests',
+            {},
+            {
+                preserveState: false,
+                replace: true,
+            },
+        );
+    };
+
     const getExportUrl = (format: 'excel' | 'pdf') => {
         const params = new URLSearchParams();
         if (search) params.append('search', search);
         if (filters.status) params.append('status', filters.status);
-        if (filters.date) params.append('date', filters.date);
+        if (filters.start_date) params.append('start_date', filters.start_date);
+        if (filters.end_date) params.append('end_date', filters.end_date);
 
         return `/shift-change-requests/export/${format}?${params.toString()}`;
     };
@@ -225,15 +267,23 @@ export default function Index({
                                 </SelectItem>
                             </SelectContent>
                         </Select>
-                        <Input
-                            type="date"
-                            className="w-44"
-                            placeholder="Tanggal"
-                            value={filters.date ?? ''}
-                            onChange={(e) =>
-                                handleFilterChange('date', e.target.value)
-                            }
+                        <DateRangePicker
+                            startDate={filters.start_date}
+                            endDate={filters.end_date}
+                            onSelect={handleDateRangeChange}
+                            placeholder="Filter Periode"
                         />
+                        {hasActiveFilters && (
+                            <Button
+                                variant="outline"
+                                onClick={handleResetFilters}
+                                className="h-9 px-3"
+                                title="Reset Filter"
+                            >
+                                <RotateCcw className="mr-2 h-4 w-4" />
+                                Reset Filter
+                            </Button>
+                        )}
                     </div>
                 </div>
 

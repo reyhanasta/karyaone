@@ -5,12 +5,14 @@ import {
     FileDown,
     Pencil,
     Plus,
+    RotateCcw,
     Search,
 } from 'lucide-react';
 import { useRef, useState } from 'react';
 import { Pagination } from '@/components/pagination';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { DateRangePicker } from '@/components/ui/date-range-picker';
 import {
     Dialog,
     DialogContent,
@@ -43,7 +45,6 @@ type LeaveTypeOption = { id: number; name: string };
 
 export default function Index({
     leaveRequests,
-    leaveTypes,
     filters,
 }: {
     leaveRequests: any;
@@ -51,7 +52,8 @@ export default function Index({
     filters: {
         status?: string;
         search?: string;
-        date?: string;
+        start_date?: string;
+        end_date?: string;
         leave_type_id?: string;
     };
 }) {
@@ -111,6 +113,45 @@ export default function Index({
         );
     };
 
+    const handleDateRangeChange = (range: {
+        startDate?: string;
+        endDate?: string;
+    }) => {
+        router.get(
+            '/leave-requests',
+            {
+                ...filters,
+                search,
+                start_date: range.startDate,
+                end_date: range.endDate,
+            },
+            {
+                preserveState: true,
+                replace: true,
+            },
+        );
+    };
+
+    const hasActiveFilters = Boolean(
+        search ||
+        (filters.status && filters.status !== 'all') ||
+        (filters.leave_type_id && filters.leave_type_id !== 'all') ||
+        filters.start_date ||
+        filters.end_date,
+    );
+
+    const handleResetFilters = () => {
+        setSearch('');
+        router.get(
+            '/leave-requests',
+            {},
+            {
+                preserveState: false,
+                replace: true,
+            },
+        );
+    };
+
     const showActions = true; // Everyone can at least view details
 
     const getExportUrl = (format: 'excel' | 'pdf') => {
@@ -119,7 +160,8 @@ export default function Index({
         if (filters.status) params.append('status', filters.status);
         if (filters.leave_type_id)
             params.append('leave_type_id', filters.leave_type_id);
-        if (filters.date) params.append('date', filters.date);
+        if (filters.start_date) params.append('start_date', filters.start_date);
+        if (filters.end_date) params.append('end_date', filters.end_date);
 
         return `/leave-requests/export/${format}?${params.toString()}`;
     };
@@ -191,27 +233,6 @@ export default function Index({
                     )}
                     <div className="flex flex-1 flex-wrap items-center justify-end gap-4">
                         <Select
-                            value={filters.leave_type_id ?? 'all'}
-                            onValueChange={(val) =>
-                                handleFilterChange('leave_type_id', val)
-                            }
-                        >
-                            <SelectTrigger className="w-44">
-                                <SelectValue placeholder="Semua Jenis" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="all">Semua Jenis</SelectItem>
-                                {leaveTypes.map((type) => (
-                                    <SelectItem
-                                        key={type.id}
-                                        value={String(type.id)}
-                                    >
-                                        {type.name}
-                                    </SelectItem>
-                                ))}
-                            </SelectContent>
-                        </Select>
-                        <Select
                             value={filters.status ?? 'all'}
                             onValueChange={(val) =>
                                 handleFilterChange('status', val)
@@ -238,15 +259,23 @@ export default function Index({
                                 </SelectItem>
                             </SelectContent>
                         </Select>
-                        <Input
-                            type="date"
-                            className="w-44"
-                            placeholder="Tanggal Mulai"
-                            value={filters.date ?? ''}
-                            onChange={(e) =>
-                                handleFilterChange('date', e.target.value)
-                            }
+                        <DateRangePicker
+                            startDate={filters.start_date}
+                            endDate={filters.end_date}
+                            onSelect={handleDateRangeChange}
+                            placeholder="Filter Periode"
                         />
+                        {hasActiveFilters && (
+                            <Button
+                                variant="outline"
+                                onClick={handleResetFilters}
+                                className="h-9 px-3"
+                                title="Reset Filter"
+                            >
+                                <RotateCcw className="mr-2 h-4 w-4" />
+                                Reset Filter
+                            </Button>
+                        )}
                     </div>
                 </div>
 
