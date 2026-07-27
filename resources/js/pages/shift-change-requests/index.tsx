@@ -13,9 +13,9 @@ import {
 } from 'lucide-react';
 import { useState, useRef } from 'react';
 import { Pagination } from '@/components/pagination';
-import { DateRangePicker } from '@/components/ui/date-range-picker';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { DateRangePicker } from '@/components/ui/date-range-picker';
 import { Input } from '@/components/ui/input';
 import {
     Select,
@@ -99,7 +99,10 @@ export default function Index({
         );
     };
 
-    const handleDateRangeChange = (range: { startDate?: string; endDate?: string }) => {
+    const handleDateRangeChange = (range: {
+        startDate?: string;
+        endDate?: string;
+    }) => {
         router.get(
             '/shift-change-requests',
             {
@@ -119,7 +122,7 @@ export default function Index({
         search ||
         (filters.status && filters.status !== 'all') ||
         filters.start_date ||
-        filters.end_date
+        filters.end_date,
     );
 
     const handleResetFilters = () => {

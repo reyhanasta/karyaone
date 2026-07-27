@@ -13,11 +13,7 @@ use App\Http\Controllers\PositionController;
 use App\Http\Controllers\ShiftChangeRequestController;
 use App\Http\Controllers\ShiftController;
 use App\Models\Employee;
-use App\Models\OvertimeRequest;
-use App\Models\User;
-use App\Notifications\OvertimeRequestNotification;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -142,6 +138,5 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ->only(['index', 'create', 'store', 'show', 'edit', 'update'])
         ->middleware('permission:shift-change-request.view');
 });
-
 
 require __DIR__.'/settings.php';

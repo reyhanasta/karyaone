@@ -12,6 +12,7 @@ import { useRef, useState } from 'react';
 import { Pagination } from '@/components/pagination';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { DateRangePicker } from '@/components/ui/date-range-picker';
 import {
     Dialog,
     DialogContent,
@@ -20,7 +21,6 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog';
-import { DateRangePicker } from '@/components/ui/date-range-picker';
 import { Input } from '@/components/ui/input';
 import {
     Select,
@@ -45,7 +45,6 @@ type LeaveTypeOption = { id: number; name: string };
 
 export default function Index({
     leaveRequests,
-    leaveTypes,
     filters,
 }: {
     leaveRequests: any;
