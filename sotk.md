@@ -3,7 +3,7 @@
 
 ## Informasi Umum
 - **Lokasi**: Pekanbaru
-- **Tanggal Dokumen**: 06 Mei 2026
+- **Tanggal Dokumen**: 27 Juli 2026
 - **Otoritas Tertinggi**: dr. Putri Sari Yenni
 
 ---
@@ -58,14 +58,37 @@
 
 ---
 
+## Mapping System KaryaOne HRIS
+
+### 1. Structure Mapping (Departemen & Jabatan di Database)
+
+| Departemen System | Jabatan / Posisi System |
+| :--- | :--- |
+| **Manajemen** | Direktur, Manajer, Casemix HRD, IT, Staff Laboratorium, Keuangan |
+| **Pelayanan Medis** | Perawat, Bidan, Rekam Medis, Dokter |
+| **Farmasi & Keuangan** | Apoteker, Asisten Apoteker |
+| **Security & Driver** | Security |
+| **Cleaning Service** | Cleaning Service |
+
+### 2. Role-Based Access Control (RBAC) & Multi-Level Approval
+- **Super Admin**: Akses penuh ke seluruh sistem & modul.
+- **Director**: Persetujuan tingkat akhir (Cuti, Lembur, Tukar Shift).
+- **HR Admin (`hr-admin`)**: Mengelola data karyawan, kuota cuti, dan persetujuan HRD (`pending_hrd`).
+- **Manager (`manager`)**: Persetujuan manajerial tingkat departemen (`pending_manager`).
+- **Kepala Ruangan (`karu`)**: Persetujuan tingkat pertama unit/ruangan untuk pengajuan anggotanya.
+- **Employee**: Mengajukan cuti, lembur, dan tukar shift serta melihat data personal.
+
+---
+
 ## Metadata AI (Contextual Data)
 - **Total Penanggung Jawab Utama**: 3 Orang
 - **Total Unit di Bawah Pelayanan**: 9 Unit
 - **Total Unit di Bawah Administrasi**: 6 Unit
 - **Total Unit di Bawah Mutu**: 5 Unit
-- **Double Role (Perangkapan Jabatan)**: 
+- **Double Role (Perangkapan Jabatan Operational)**: 
   - Widya Habibie (Administrasi, Keuangan, Sarpras, Audit Maternal)
   - Weni Saputri (Ruang Bersalin, PPI)
   - Restu Damayanti (Ruang Tindakan, Manajemen Risiko)
   - dr. Adib Aulia Rahman (Pemeriksaan Umum, Keselamatan Pasien)
   - Erma Putri (Laboratorium, K3)
+- **Terakhir Diperbarui**: 27 Juli 2026
