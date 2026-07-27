@@ -5,6 +5,7 @@ import {
     FileDown,
     Pencil,
     Plus,
+    RotateCcw,
     Search,
 } from 'lucide-react';
 
@@ -20,6 +21,7 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog';
+import { DateRangePicker } from '@/components/ui/date-range-picker';
 import { Input } from '@/components/ui/input';
 import {
     Select,
@@ -49,7 +51,8 @@ export default function Index({
     filters: {
         status?: string;
         search?: string;
-        date?: string;
+        start_date?: string;
+        end_date?: string;
     };
 }) {
     const { can } = usePermissions();
@@ -107,6 +110,41 @@ export default function Index({
         );
     };
 
+    const handleDateRangeChange = (range: { startDate?: string; endDate?: string }) => {
+        router.get(
+            '/overtime-requests',
+            {
+                ...filters,
+                search,
+                start_date: range.startDate,
+                end_date: range.endDate,
+            },
+            {
+                preserveState: true,
+                replace: true,
+            },
+        );
+    };
+
+    const hasActiveFilters = Boolean(
+        search ||
+        (filters.status && filters.status !== 'all') ||
+        filters.start_date ||
+        filters.end_date
+    );
+
+    const handleResetFilters = () => {
+        setSearch('');
+        router.get(
+            '/overtime-requests',
+            {},
+            {
+                preserveState: false,
+                replace: true,
+            },
+        );
+    };
+
     const calculateDuration = (start: string, end: string) => {
         if (!start || !end) return '0';
         const [h1, m1] = start.split(':').map(Number);
@@ -122,7 +160,8 @@ export default function Index({
         const params = new URLSearchParams();
         if (search) params.append('search', search);
         if (filters.status) params.append('status', filters.status);
-        if (filters.date) params.append('date', filters.date);
+        if (filters.start_date) params.append('start_date', filters.start_date);
+        if (filters.end_date) params.append('end_date', filters.end_date);
 
         return `/overtime-requests/export/${format}?${params.toString()}`;
     };
@@ -218,15 +257,23 @@ export default function Index({
                                 </SelectItem>
                             </SelectContent>
                         </Select>
-                        <Input
-                            type="date"
-                            className="w-44"
-                            placeholder="Tanggal"
-                            value={filters.date ?? ''}
-                            onChange={(e) =>
-                                handleFilterChange('date', e.target.value)
-                            }
+                        <DateRangePicker
+                            startDate={filters.start_date}
+                            endDate={filters.end_date}
+                            onSelect={handleDateRangeChange}
+                            placeholder="Filter Periode"
                         />
+                        {hasActiveFilters && (
+                            <Button
+                                variant="outline"
+                                onClick={handleResetFilters}
+                                className="h-9 px-3"
+                                title="Reset Filter"
+                            >
+                                <RotateCcw className="mr-2 h-4 w-4" />
+                                Reset Filter
+                            </Button>
+                        )}
                     </div>
                 </div>
 

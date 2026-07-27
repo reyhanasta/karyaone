@@ -32,6 +32,9 @@
 <body>
     <div class="header">
         <h1>Laporan Pengajuan Lembur</h1>
+        @if(!empty($startDate) || !empty($endDate))
+            <p>Periode: {{ !empty($startDate) ? \Carbon\Carbon::parse($startDate)->format('d-m-Y') : '-' }} s/d {{ !empty($endDate) ? \Carbon\Carbon::parse($endDate)->format('d-m-Y') : '-' }}</p>
+        @endif
         <p>Dicetak pada: {{ now()->format('d-m-Y H:i') }}</p>
     </div>
 

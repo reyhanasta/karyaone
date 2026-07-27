@@ -23,21 +23,23 @@ class OvertimeRequestController extends Controller
     {
         $status = $request->input('status');
         $search = $request->input('search');
-        $date = $request->input('date');
+        $startDate = $request->input('start_date');
+        $endDate = $request->input('end_date');
 
-        $query = $this->getBaseQuery($status, $search, $date);
+        $query = $this->getBaseQuery($status, $search, $startDate, $endDate);
 
         return Inertia::render('overtime-requests/index', [
             'overtimeRequests' => $query->orderBy('date', 'desc')->paginate(10)->withQueryString(),
             'filters' => [
                 'status' => $status,
                 'search' => $search,
-                'date' => $date,
+                'start_date' => $startDate,
+                'end_date' => $endDate,
             ],
         ]);
     }
 
-    private function getBaseQuery($status = null, $search = null, $date = null)
+    private function getBaseQuery($status = null, $search = null, $startDate = null, $endDate = null)
     {
         $user = Auth::user();
         $query = OvertimeRequest::with('employee');
@@ -69,7 +71,8 @@ class OvertimeRequestController extends Controller
             $q->whereHas('employee', fn ($q2) => $q2->where('full_name', 'like', "%{$search}%"));
         });
 
-        $query->when($date, fn ($q) => $q->whereDate('date', $date));
+        $query->when($startDate, fn ($q) => $q->whereDate('date', '>=', $startDate));
+        $query->when($endDate, fn ($q) => $q->whereDate('date', '<=', $endDate));
 
         return $query;
     }
@@ -370,20 +373,24 @@ class OvertimeRequestController extends Controller
     public function exportExcel(Request $request)
     {
         $filename = 'overtime_requests_'.now()->format('Y-m-d').'.xlsx';
-        $filters = $request->only(['status', 'search', 'date']);
+        $filters = $request->only(['status', 'search', 'start_date', 'end_date']);
 
         return Excel::download(new OvertimeRequestExport($filters), $filename);
     }
 
     public function exportPdf(Request $request)
     {
+        $startDate = $request->input('start_date');
+        $endDate = $request->input('end_date');
+
         $requests = $this->getBaseQuery(
             $request->status,
             $request->search,
-            $request->date
+            $startDate,
+            $endDate
         )->where('is_display_export', true)->orderBy('date', 'desc')->get();
 
-        $pdf = Pdf::loadView('exports.overtime-requests', compact('requests'));
+        $pdf = Pdf::loadView('exports.overtime-requests', compact('requests', 'startDate', 'endDate'));
 
         return $pdf->download('overtime_requests_'.now()->format('Y-m-d').'.pdf');
     }

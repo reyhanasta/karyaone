@@ -23,21 +23,23 @@ class ShiftChangeRequestController extends Controller
     {
         $status = $request->input('status');
         $search = $request->input('search');
-        $date = $request->input('date');
+        $startDate = $request->input('start_date');
+        $endDate = $request->input('end_date');
 
-        $query = $this->getBaseQuery($status, $search, $date);
+        $query = $this->getBaseQuery($status, $search, $startDate, $endDate);
 
         return Inertia::render('shift-change-requests/index', [
             'requests' => $query->paginate(15)->withQueryString(),
             'filters' => [
                 'status' => $status,
                 'search' => $search,
-                'date' => $date,
+                'start_date' => $startDate,
+                'end_date' => $endDate,
             ],
         ]);
     }
 
-    private function getBaseQuery($status = null, $search = null, $date = null)
+    private function getBaseQuery($status = null, $search = null, $startDate = null, $endDate = null)
     {
         $user = Auth::user();
         $query = ShiftChangeRequest::with([
@@ -81,22 +83,29 @@ class ShiftChangeRequestController extends Controller
                 ->orWhereHas('target', fn ($q2) => $q2->where('full_name', 'like', "%{$search}%"));
         });
 
-        $query->when($date, fn ($q) => $q->whereDate('request_date', $date));
+        $query->when($startDate, fn ($q) => $q->whereDate('request_date', '>=', $startDate));
+        $query->when($endDate, fn ($q) => $q->whereDate('request_date', '<=', $endDate));
 
         return $query;
     }
 
     public function exportExcel(Request $request)
     {
-        $requests = $this->getBaseQuery($request->status, $request->search, $request->date)->get();
+        $startDate = $request->input('start_date');
+        $endDate = $request->input('end_date');
+
+        $requests = $this->getBaseQuery($request->status, $request->search, $startDate, $endDate)->get();
 
         return Excel::download(new ShiftChangeRequestsExport($requests), 'shift_change_requests_'.now()->format('YmdHis').'.xlsx');
     }
 
     public function exportPdf(Request $request)
     {
-        $requests = $this->getBaseQuery($request->status, $request->search, $request->date)->get();
-        $pdf = Pdf::loadView('exports.shift-change-requests', compact('requests'));
+        $startDate = $request->input('start_date');
+        $endDate = $request->input('end_date');
+
+        $requests = $this->getBaseQuery($request->status, $request->search, $startDate, $endDate)->get();
+        $pdf = Pdf::loadView('exports.shift-change-requests', compact('requests', 'startDate', 'endDate'));
 
         return $pdf->download('shift_change_requests_'.now()->format('YmdHis').'.pdf');
     }
