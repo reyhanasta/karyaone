@@ -19,6 +19,7 @@ class Position extends Model
         'name',
         'description',
         'department_id',
+        'replacement_group_id',
     ];
 
     protected function casts(): array
@@ -40,6 +41,41 @@ class Position extends Model
     public function department(): BelongsTo
     {
         return $this->belongsTo(Department::class);
+    }
+
+    public function replacementGroup(): BelongsTo
+    {
+        return $this->belongsTo(ReplacementGroup::class);
+    }
+
+    /**
+     * The name of the replacement group this position belongs to (null when unassigned).
+     */
+    protected function replacementGroupName(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => $this->replacementGroup?->name,
+        );
+    }
+
+    /**
+     * Determine whether this position may be replaced by another position.
+     *
+     * Rule: both positions must belong to the same department AND share the
+     * same replacement group. When a position has no explicit group, it
+     * falls back to being its own group (same position id only).
+     */
+    public function isReplaceableBy(Position $other): bool
+    {
+        if ($this->department_id !== $other->department_id) {
+            return false;
+        }
+
+        if ($this->replacement_group_id !== null && $other->replacement_group_id !== null) {
+            return $this->replacement_group_id === $other->replacement_group_id;
+        }
+
+        return $this->id === $other->id;
     }
 
     public function employees(): HasMany

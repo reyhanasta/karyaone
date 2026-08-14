@@ -26,10 +26,12 @@ import AppLayout from '@/layouts/app-layout';
 export default function Index({
     positions,
     departments,
+    replacementGroups = [],
     filters,
 }: {
     positions: any;
     departments: any[];
+    replacementGroups?: { id: number; name: string }[];
     filters: { search?: string };
 }) {
     const [search, setSearch] = useState(filters.search ?? '');
@@ -40,11 +42,33 @@ export default function Index({
     );
     const searchTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-    const { data, setData, post, put, reset, errors, processing } = useForm({
-        name: '',
-        description: '',
-        department_id: '',
-    });
+    const { data, setData, post, put, reset, errors, processing, transform } =
+        useForm({
+            name: '',
+            description: '',
+            department_id: '',
+            replacement_group_id: '',
+            new_group_name: '',
+        });
+
+    const buildPayload = (formData: typeof data) => {
+        const payload: Record<string, unknown> = {
+            name: formData.name,
+            description: formData.description,
+            department_id: formData.department_id,
+        };
+
+        if (formData.new_group_name.trim()) {
+            payload.new_group_name = formData.new_group_name.trim();
+        } else if (
+            formData.replacement_group_id &&
+            formData.replacement_group_id !== 'none'
+        ) {
+            payload.replacement_group_id = formData.replacement_group_id;
+        }
+
+        return payload;
+    };
 
     const handleSearchChange = (value: string) => {
         setSearch(value);
@@ -60,6 +84,7 @@ export default function Index({
 
     const handleCreate = (e: React.FormEvent) => {
         e.preventDefault();
+        transform(buildPayload);
         post('/positions', {
             onSuccess: () => {
                 setIsCreateOpen(false);
@@ -74,11 +99,15 @@ export default function Index({
             name: position.name,
             description: position.description || '',
             department_id: position.department_id?.toString() || '',
+            replacement_group_id:
+                position.replacement_group_id?.toString() || '',
+            new_group_name: '',
         });
     };
 
     const handleUpdate = (e: React.FormEvent) => {
         e.preventDefault();
+        transform(buildPayload);
         put(`/positions/${editPosition?.id}`, {
             onSuccess: () => {
                 setEditPosition(null);
@@ -194,6 +223,68 @@ export default function Index({
                                         {errors.department_id && (
                                             <p className="text-sm text-destructive">
                                                 {errors.department_id}
+                                            </p>
+                                        )}
+                                    </div>
+                                    <div className="grid gap-2">
+                                        <Label htmlFor="replacement_group_id">
+                                            Grup Pengganti
+                                        </Label>
+                                        <Select
+                                            value={data.replacement_group_id}
+                                            onValueChange={(v) =>
+                                                setData(
+                                                    'replacement_group_id',
+                                                    v,
+                                                )
+                                            }
+                                        >
+                                            <SelectTrigger
+                                                id="replacement_group_id"
+                                                className="w-full"
+                                            >
+                                                <SelectValue placeholder="Pilih grup pengganti (opsional)" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectItem value="none">
+                                                    Tidak ada grup
+                                                </SelectItem>
+                                                {replacementGroups.map(
+                                                    (group) => (
+                                                        <SelectItem
+                                                            key={group.id}
+                                                            value={group.id.toString()}
+                                                        >
+                                                            {group.name}
+                                                        </SelectItem>
+                                                    ),
+                                                )}
+                                            </SelectContent>
+                                        </Select>
+                                        {errors.replacement_group_id && (
+                                            <p className="text-sm text-destructive">
+                                                {errors.replacement_group_id}
+                                            </p>
+                                        )}
+                                    </div>
+                                    <div className="grid gap-2">
+                                        <Label htmlFor="new_group_name">
+                                            Buat grup baru
+                                        </Label>
+                                        <Input
+                                            id="new_group_name"
+                                            value={data.new_group_name}
+                                            onChange={(e) =>
+                                                setData(
+                                                    'new_group_name',
+                                                    e.target.value,
+                                                )
+                                            }
+                                            placeholder="Nama grup baru (opsional)"
+                                        />
+                                        {errors.new_group_name && (
+                                            <p className="text-sm text-destructive">
+                                                {errors.new_group_name}
                                             </p>
                                         )}
                                     </div>
@@ -378,6 +469,63 @@ export default function Index({
                                     {errors.department_id && (
                                         <p className="text-sm text-destructive">
                                             {errors.department_id}
+                                        </p>
+                                    )}
+                                </div>
+                                <div className="grid gap-2">
+                                    <Label htmlFor="edit-replacement_group_id">
+                                        Grup Pengganti
+                                    </Label>
+                                    <Select
+                                        value={data.replacement_group_id}
+                                        onValueChange={(v) =>
+                                            setData('replacement_group_id', v)
+                                        }
+                                    >
+                                        <SelectTrigger
+                                            id="edit-replacement_group_id"
+                                            className="w-full"
+                                        >
+                                            <SelectValue placeholder="Pilih grup pengganti (opsional)" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="none">
+                                                Tidak ada grup
+                                            </SelectItem>
+                                            {replacementGroups.map((group) => (
+                                                <SelectItem
+                                                    key={group.id}
+                                                    value={group.id.toString()}
+                                                >
+                                                    {group.name}
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                    {errors.replacement_group_id && (
+                                        <p className="text-sm text-destructive">
+                                            {errors.replacement_group_id}
+                                        </p>
+                                    )}
+                                </div>
+                                <div className="grid gap-2">
+                                    <Label htmlFor="edit-new_group_name">
+                                        Buat grup baru
+                                    </Label>
+                                    <Input
+                                        id="edit-new_group_name"
+                                        value={data.new_group_name}
+                                        onChange={(e) =>
+                                            setData(
+                                                'new_group_name',
+                                                e.target.value,
+                                            )
+                                        }
+                                        placeholder="Nama grup baru (opsional)"
+                                    />
+                                    {errors.new_group_name && (
+                                        <p className="text-sm text-destructive">
+                                            {errors.new_group_name}
                                         </p>
                                     )}
                                 </div>

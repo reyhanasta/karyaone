@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\Department;
 use App\Models\Position;
+use App\Models\ReplacementGroup;
 use Illuminate\Database\Seeder;
 
 class PositionSeeder extends Seeder
@@ -45,10 +46,20 @@ class PositionSeeder extends Seeder
 
             if ($department) {
                 foreach ($positions as $posName) {
-                    Position::updateOrCreate(
+                    $position = Position::updateOrCreate(
                         ['name' => $posName],
                         ['department_id' => $department->id]
                     );
+
+                    // Assign replacement group when not already configured:
+                    // "Farmasi & Keuangan" positions share the "Farmasi" group,
+                    // every other position defaults to a group named after itself.
+                    if ($position->replacement_group_id === null) {
+                        $groupName = $deptName === 'Farmasi & Keuangan' ? 'Farmasi' : $posName;
+                        $group = ReplacementGroup::firstOrCreate(['name' => $groupName]);
+
+                        $position->update(['replacement_group_id' => $group->id]);
+                    }
                 }
             }
         }

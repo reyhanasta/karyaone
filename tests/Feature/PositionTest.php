@@ -3,6 +3,7 @@
 use App\Models\Department;
 use App\Models\Employee;
 use App\Models\Position;
+use App\Models\ReplacementGroup;
 use App\Models\User;
 use Spatie\Permission\Models\Permission;
 
@@ -110,4 +111,77 @@ test('cannot delete a position with employees', function () {
     $this->assertDatabaseHas('positions', [
         'id' => $position->id,
     ]);
+});
+
+test('position store with new_group_name creates a replacement group', function () {
+    $department = Department::create(['name' => 'Farmasi & Keuangan']);
+
+    $response = $this->actingAs($this->authorizedUser)->post(route('positions.store'), [
+        'name' => 'Apoteker',
+        'department_id' => $department->id,
+        'new_group_name' => 'Farmasi',
+    ]);
+
+    $response->assertSessionHas('success');
+
+    $group = ReplacementGroup::where('name', 'Farmasi')->first();
+    expect($group)->not->toBeNull();
+
+    $this->assertDatabaseHas('positions', [
+        'name' => 'Apoteker',
+        'department_id' => $department->id,
+        'replacement_group_id' => $group->id,
+    ]);
+});
+
+test('position store without a group choice gets an own-named default group', function () {
+    $department = Department::create(['name' => 'Pelayanan Medis']);
+
+    $response = $this->actingAs($this->authorizedUser)->post(route('positions.store'), [
+        'name' => 'Perawat',
+        'description' => 'Tim medis',
+        'department_id' => $department->id,
+    ]);
+
+    $response->assertSessionHas('success');
+
+    $group = ReplacementGroup::where('name', 'Perawat')->first();
+    expect($group)->not->toBeNull();
+
+    $this->assertDatabaseHas('positions', [
+        'name' => 'Perawat',
+        'replacement_group_id' => $group->id,
+    ]);
+});
+
+test('position store with replacement_group_id uses the existing group', function () {
+    $department = Department::create(['name' => 'Manajemen']);
+    $group = ReplacementGroup::create(['name' => 'Grup Direksi']);
+
+    $response = $this->actingAs($this->authorizedUser)->post(route('positions.store'), [
+        'name' => 'Direktur',
+        'department_id' => $department->id,
+        'replacement_group_id' => $group->id,
+    ]);
+
+    $response->assertSessionHas('success');
+
+    $this->assertDatabaseHas('positions', [
+        'name' => 'Direktur',
+        'replacement_group_id' => $group->id,
+    ]);
+});
+
+test('positions index passes all replacement groups', function () {
+    ReplacementGroup::create(['name' => 'Farmasi']);
+    ReplacementGroup::create(['name' => 'Keuangan']);
+
+    $this->actingAs($this->authorizedUser)
+        ->get(route('positions.index'))
+        ->assertOk()
+        ->assertInertia(fn ($page) => $page
+            ->component('positions/index')
+            ->has('replacementGroups', 2)
+            ->where('replacementGroups.0.name', 'Farmasi')
+        );
 });
