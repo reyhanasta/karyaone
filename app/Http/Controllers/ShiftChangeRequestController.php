@@ -12,6 +12,7 @@ use App\Models\User;
 use App\Notifications\ShiftChangeRequestNotification;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
@@ -124,23 +125,35 @@ class ShiftChangeRequestController extends Controller
 
         if ($employee) {
             $myFilteredShifts = $shifts->where('department_id', $employee->department_id)->values();
-            $myTargetEmployees = Employee::with(['department', 'position'])
-                ->where('position_id', $employee->position_id)
-                ->where('id', '!=', $employee->id)
-                ->get();
+            $requesterPosition = $employee->position;
+
+            $myTargetEmployees = $this->withReplacementGroupName(
+                Employee::with(['department', 'position.replacementGroup'])
+                    ->where('department_id', $employee->department_id)
+                    ->where('id', '!=', $employee->id)
+                    ->get()
+                    ->filter(function (Employee $target) use ($requesterPosition) {
+                        return $requesterPosition && $target->position && $requesterPosition->isReplaceableBy($target->position);
+                    })
+                    ->values()
+            );
         }
 
         if ($canCreateAny) {
             if ($user->hasRole(['super-admin', 'hr-admin'])) {
-                $assignableEmployees = Employee::with(['department', 'position'])->orderBy('full_name')->get();
+                $assignableEmployees = $this->withReplacementGroupName(
+                    Employee::with(['department', 'position.replacementGroup'])->orderBy('full_name')->get()
+                );
             } else {
                 $managedDeptIds = $user->managedDepartments()->pluck('departments.id')->toArray();
 
-                $assignableEmployees = Employee::with(['department', 'position'])
-                    ->whereIn('department_id', $managedDeptIds)
-                    ->where('id', '!=', $user->employee->id ?? 0)
-                    ->orderBy('full_name')
-                    ->get();
+                $assignableEmployees = $this->withReplacementGroupName(
+                    Employee::with(['department', 'position.replacementGroup'])
+                        ->whereIn('department_id', $managedDeptIds)
+                        ->where('id', '!=', $user->employee->id ?? 0)
+                        ->orderBy('full_name')
+                        ->get()
+                );
             }
 
             return Inertia::render('shift-change-requests/create', [
@@ -189,6 +202,16 @@ class ShiftChangeRequestController extends Controller
         }
 
         $targetEmployee = Employee::findOrFail($validated['target_id']);
+
+        // Enforce the replacement group rule (same department + same group).
+        $requester->loadMissing('position');
+        $targetEmployee->loadMissing('position');
+
+        if (! $this->positionsAllowReplacement($requester, $targetEmployee)) {
+            return back()
+                ->withErrors(['target_id' => $this->replacementGroupErrorMessage($requester, $targetEmployee)])
+                ->withInput();
+        }
 
         // Prevent duplicate requests
         $existing = ShiftChangeRequest::where('requester_id', $requester->id)
@@ -404,7 +427,9 @@ class ShiftChangeRequestController extends Controller
         }
 
         $shifts = Shift::where('is_active', true)->get();
-        $employees = Employee::with(['department', 'position'])->orderBy('full_name')->get();
+        $employees = $this->withReplacementGroupName(
+            Employee::with(['department', 'position.replacementGroup'])->orderBy('full_name')->get()
+        );
 
         $user = Auth::user();
         $canCreateAny = $user->can('shift-change-request.create.any');
@@ -426,6 +451,18 @@ class ShiftChangeRequestController extends Controller
         }
 
         $validated = $request->validated();
+
+        // Enforce the replacement group rule (same department + same group).
+        $requester = Employee::findOrFail($validated['requester_id'] ?? $shift_change_request->requester_id);
+        $targetEmployee = Employee::findOrFail($validated['target_id']);
+        $requester->loadMissing('position');
+        $targetEmployee->loadMissing('position');
+
+        if (! $this->positionsAllowReplacement($requester, $targetEmployee)) {
+            return back()
+                ->withErrors(['target_id' => $this->replacementGroupErrorMessage($requester, $targetEmployee)])
+                ->withInput();
+        }
 
         $shift_change_request->update([
             'requester_id' => $validated['requester_id'] ?? $shift_change_request->requester_id,
@@ -456,5 +493,47 @@ class ShiftChangeRequestController extends Controller
         ]);
 
         return redirect()->route('shift-change-requests.index')->with('success', 'Permintaan tukar shift telah dibatalkan.');
+    }
+
+    /**
+     * Determine whether the target employee is allowed to replace the requester
+     * according to the replacement group rule.
+     */
+    private function positionsAllowReplacement(Employee $requester, Employee $target): bool
+    {
+        $requester->loadMissing('position');
+        $target->loadMissing('position');
+
+        return $requester->position && $target->position && $requester->position->isReplaceableBy($target->position);
+    }
+
+    /**
+     * Augment each employee's position with the replacement group name so the
+     * frontend receives `position.replacement_group_name`.
+     */
+    private function withReplacementGroupName(Collection $employees): Collection
+    {
+        return $employees->map(function (Employee $employee) {
+            if ($employee->relationLoaded('position') && $employee->position !== null) {
+                $employee->position->setAttribute('replacement_group_name', $employee->position->replacementGroup?->name);
+            }
+
+            return $employee;
+        });
+    }
+
+    /**
+     * Build the Indonesian error message for an invalid replacement target.
+     */
+    private function replacementGroupErrorMessage(Employee $requester, Employee $target): string
+    {
+        $requester->loadMissing('position');
+        $target->loadMissing('position');
+
+        if ($requester->position?->department_id !== $target->position?->department_id) {
+            return 'Karyawan pengganti harus berada di departemen yang sama dengan pemohon.';
+        }
+
+        return 'Karyawan pengganti harus satu Grup Pengganti dengan pemohon.';
     }
 }

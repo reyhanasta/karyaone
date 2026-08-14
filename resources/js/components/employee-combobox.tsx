@@ -12,7 +12,7 @@ type Employee = {
     id: number;
     full_name: string;
     department?: { name: string };
-    position?: { name: string };
+    position?: { name: string | null };
 };
 
 interface EmployeeComboboxProps {

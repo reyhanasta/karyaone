@@ -21,13 +21,20 @@ type Shift = {
     end_time: string;
     department_id?: number;
 };
+type Position = {
+    id: number;
+    name: string | null;
+    replacement_group_id: number | null;
+    replacement_group_name: string | null;
+};
+
 type Employee = {
     id: number;
     full_name: string;
     department_id?: number;
     position_id?: number;
     department?: { name: string };
-    position?: { name: string };
+    position?: Position;
 };
 
 type ShiftChangeRequest = {
@@ -74,11 +81,24 @@ export default function Edit({
 
     const availableTargets = useMemo(() => {
         if (!selectedRequesterObj) return [];
-        return employees.filter(
-            (e) =>
-                e.position_id === selectedRequesterObj.position_id &&
-                String(e.id) !== data.requester_id,
-        );
+        return employees.filter((e) => {
+            if (String(e.id) === data.requester_id) return false;
+            if (e.department_id !== selectedRequesterObj.department_id) {
+                return false;
+            }
+
+            const requesterGroupId =
+                selectedRequesterObj.position?.replacement_group_id ?? null;
+            const targetGroupId = e.position?.replacement_group_id ?? null;
+
+            // Same replacement group when both are assigned; otherwise fall
+            // back to the same position (each position is its own group by
+            // default).
+            if (requesterGroupId !== null && targetGroupId !== null) {
+                return requesterGroupId === targetGroupId;
+            }
+            return e.position_id === selectedRequesterObj.position_id;
+        });
     }, [employees, selectedRequesterObj, data.requester_id]);
 
     const selectedShift = availableShifts.find(
